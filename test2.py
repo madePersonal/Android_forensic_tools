@@ -12,7 +12,7 @@ asu = {}
 n = 0
 j = 0
 
-file=adb.run_cmd("shell ls sdcard/movies -l")
+file=adb.shell_command('ls /acct/uid -l')
 
 # line = file.split('\n')
 # y = (str(line[3]).split(' '))
@@ -45,8 +45,24 @@ def creat_array(text):
     del o[0]
     return o
 
-# print(creat_array(file))
+def insertToDB():
+    result =[]
+    array=creat_array(file)
+    a = len(array)
+    if a > 1 :
+        n = 0
+        for l in array:
+            permmisison = array[n][0]
+            if "d" in permmisison:
+                result.append(array[n][7])
+            if n < (a-2) :
+                n = n + 1
+            else:
+                break
+    return result
 
-print file
+print insertToDB()
+
+
 
 
