@@ -1,24 +1,14 @@
-from pyand import ADB, Fastboot
-import re
-import json
-import array as arr
-import numpy
+import pymysql
 
+con = pymysql.connect(host='localhost', port=3306, user='root', passwd='', db='andr_forensic_tools')
+cur = con.cursor()
 
-buah = "mangga jeruk nanas salak\n122 133 43 12"
-bagi_buah = buah.split("\n")
-test = ['drwxrwx---', '', '6', 'system', 'cache', '', '', '', '', '4096', '2018-05-06', '12:24', 'cache']
-g = ['as', '', 'er']
-# if '' in g:
-#     test.remove('')
-hasil = filter(None, g)
-print(hasil)
-# n = 0
-# o = []
-# # g = " ".join(y)
-# for i in bagi_buah:
-#     y = (str(bagi_buah[n]).split(" "))
-#     o.append(y)
-#     n = n + 1
+cur.execute('SELECT `name` FROM `sub_directory` WHERE id_directory =1')
+dir_name = cur.fetchall()
+filter(None, dir_name)
+
+print dir_name[0][0]
+
+# dir = "/acct/"
 #
-# print(o)
+# print('ls ' + dir +' -l')

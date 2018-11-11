@@ -1,9 +1,6 @@
 from pyand import ADB, Fastboot
 import pymysql
-import re
-import json
-import array as arr
-import numpy
+
 adb = ADB()
 dev = adb.get_devices()
 adb.set_target_by_id(0)
@@ -48,7 +45,7 @@ def creat_array(text):
     return o
 
 def insertToDB():
-    dir = " / "
+    dir = "/"
     id_dir=""
     cur.execute('INSERT INTO `directory` (`name`) VALUES ("%s")' % (dir))
     con.commit()
@@ -58,7 +55,7 @@ def insertToDB():
     for k in id :
         id_dir =k
 
-    text = adb.shell_command('ls' +dir+ '-l')
+    text = adb.shell_command('ls '+dir+' -l')
     array=creat_array(text)
 
     a = len(array)
@@ -70,24 +67,29 @@ def insertToDB():
                 cur.execute('INSERT INTO `sub_directory` (`id_directory`,`name`) VALUES (%s,"%s")'%(id_dir,array[n][7]+"/"))
                 con.commit()
             elif "-" == permmisison[:1]:
-                cur.execute('INSERT INTO `file` (`id_sub_directory`,`nama`) VALUES (%s,"%s")' % (id_dir, array[n][7]))
+                cur.execute('INSERT INTO `file` (`id_directory`,`name`) VALUES (%s,"%s")' % (id_dir, array[n][7]))
                 con.commit()
             if n < (a-2) :
                 n = n + 1
             else:
                 break
-        cur.execute('SELECT `name` FROM `sub_directory` WHERE id_direcory =%s' %(id_dir))
+        cur.execute('SELECT `name` FROM `sub_directory` WHERE id_directory =%s' %(id_dir))
         dir_name = cur.fetchall()
         for u in dir_name:
-            insertToDB2(dir+u)
+            insertToDB2(dir+u[0])
+
 
 def insertToDB2(dir):
-    sub_dir = ""
-    id_dir = None
+    id_dir = ""
     cur.execute('INSERT INTO `directory` (`name`) VALUES ("%s")' % (dir))
     con.commit()
 
-    text = adb.shell_command('ls' + dir + '-l')
+    cur.execute('SELECT `id_directory` FROM directory WHERE name ="%s"' % (dir))
+    id = cur.fetchone()
+    for k in id:
+        id_dir = k
+
+    text = adb.shell_command('ls ' +dir+ ' -l')
     array = creat_array(text)
 
     a = len(array)
@@ -96,29 +98,19 @@ def insertToDB2(dir):
         for l in array:
             permmisison = array[n][0]  # permisison berada pada indek ke 0
             if "d" == permmisison[:1]:  # mencocokan kode pada huruf awal permisison
-                cur.execute('INSERT INTO `sub_directory` (`id_directory`,`nama`) VALUES (%s,"%s")' % (
-                id_dir, array[n][7] + "/"))
+                cur.execute('INSERT INTO `sub_directory` (`id_directory`,`name`) VALUES (%s,"%s")' % (id_dir, array[n][7] + "/"))
                 con.commit()
             elif "-" == permmisison[:1]:
-                cur.execute('INSERT INTO `file` (`id_directory`,`nama`) VALUES (%s,"%s")' % (id_dir, array[n][7]))
+                cur.execute('INSERT INTO `file` (`id_directory`,`name`) VALUES (%s,"%s")' % (id_dir, array[n][7]))
                 con.commit()
             if n < (a - 2):
                 n = n + 1
             else:
                 break
 
+
 insertToDB()
 
-
-
-
-
-
-
-
-
-
-print insertToDB()
 
 
 
