@@ -13,7 +13,10 @@ j = 0
 
 already_dir = []
 
-con = pymysql.connect(host='localhost', port=3306, user='root', passwd='', db='andr_forensic_tools')
+# con = pymysql.connect(host='localhost', port=3306, user='root', passwd='', db='andr_forensic_tools')
+# cur = con.cursor()
+
+con = sqlite3.connect("andr_forensic_tools.db")
 cur = con.cursor()
 
 # line = file.split('\n')
@@ -32,10 +35,12 @@ cur = con.cursor()
 #         n = n + 1
 #     print(re[0])
 
+
+
 def creat_array(text):
     n= 0
     o = []
-    line = text.split("\r\n")
+    line = text.split("\n")
     for l in line:
         y = (str(line[n]).split(" "))
         h = filter(None, y)
@@ -68,10 +73,10 @@ def insertToDB(dir):
         for l in array:
             permmisison = array[n][0] #permisison berada pada indek ke 0
             if "d" == permmisison[:1]: #mencocokan kode pada huruf awal permisison
-                cur.execute('INSERT INTO `sub_directory` (`id_directory`,`name`) VALUES (%s,"%s")'%(id_dir,array[n][5]+"/"))
+                cur.execute('INSERT INTO `sub_directory` (`id_directory`,`name`) VALUES (%s,"%s")'%(id_dir,array[n][7]+"/"))
                 con.commit()
             elif "-" == permmisison[:1]:
-                cur.execute('INSERT INTO `file` (`id_directory`,`name`) VALUES (%s,"%s")' % (id_dir, array[n][6]))
+                cur.execute('INSERT INTO `file` (`id_directory`,`name`) VALUES (%s,"%s")' % (id_dir, array[n][7]))
                 con.commit()
             if n < (a-2) :
                 n = n + 1
@@ -81,12 +86,12 @@ def insertToDB(dir):
         dir_name = cur.fetchall()
         for u in dir_name:
             insertToDB2(dir+u[0])
-        cur.execute('SELECT directory.`name`, sub_directory.name FROM sub_directory, `directory` WHERE sub_directory.id_directory=directory.id_directory AND directory.name = "%s"'%(dir+u[0]))
-        new_dir_name = cur.fetchone()
-        new_dir.append(new_dir_name[0]+new_dir_name[1])
-
-        for h in new_dir :
-            insertToDB2(h[0])
+        # cur.execute('SELECT directory.`name`, sub_directory.name FROM sub_directory, `directory` WHERE sub_directory.id_directory=directory.id_directory AND directory.name = "%s"'%(dir+u[0]))
+        # new_dir_name = cur.fetchone()
+        # new_dir.append(new_dir_name[0]+new_dir_name[1])
+        #
+        # for h in new_dir :
+        #     insertToDB2(h[0])
 
 
 def insertToDB2(dir):
@@ -108,10 +113,10 @@ def insertToDB2(dir):
         for l in array:
             permmisison = array[n][0]  # permisison berada pada indek ke 0
             if "d" == permmisison[:1]:  # mencocokan kode pada huruf awal permisison
-                cur.execute('INSERT INTO `sub_directory` (`id_directory`,`name`) VALUES (%s,"%s")' % (id_dir, array[n][5] + "/"))
+                cur.execute('INSERT INTO `sub_directory` (`id_directory`,`name`) VALUES (%s,"%s")' % (id_dir, array[n][7] + "/"))
                 con.commit()
             elif "-" == permmisison[:1]:
-                cur.execute('INSERT INTO `file` (`id_directory`,`name`) VALUES (%s,"%s")' % (id_dir, array[n][6]))
+                cur.execute('INSERT INTO `file` (`id_directory`,`name`) VALUES (%s,"%s")' % (id_dir, array[n][7]))
                 con.commit()
             if n < (a - 2):
                 n = n + 1
