@@ -16,7 +16,7 @@ from pyand import ADB, Fastboot
 ## Class MyFrame1
 ###########################################################################
 
-class MyFrame1(wx.Frame):
+class adult(wx.Frame):
 
     __device = None
     __deviceId = None
@@ -24,7 +24,7 @@ class MyFrame1(wx.Frame):
 
     def __init__(self, parent):
         wx.Frame.__init__(self, parent, id=wx.ID_ANY, title=wx.EmptyString, pos=wx.DefaultPosition,
-                          size=wx.Size(800, 500), style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
+                          size=wx.Size(700, 500), style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
 
         self.SetSizeHintsSz(wx.DefaultSize, wx.DefaultSize)
 
@@ -137,9 +137,3 @@ class MyFrame1(wx.Frame):
             n = n + 1
         del o[0]
         return o
-
-
-if __name__ == '__main__' :
-  app = wx.App()
-  appFrame = MyFrame1(None).Show()
-  app.MainLoop()

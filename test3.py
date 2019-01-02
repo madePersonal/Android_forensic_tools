@@ -34,6 +34,7 @@
 # print(creat_array(text))
 import sqlite3
 import hashlib
+from data import data
 
 try:
     con = sqlite3.connect("andr_forensic_tools.db")
@@ -70,8 +71,5 @@ def sha1(file):
         hasher.update(buf)
     return hasher.hexdigest()
 
-print (md5("videoplayback.mp4"))
-print (md5("file/videoplayback.mp4"))
-
-print(sha1("566-1191-1-PB.pdf"))
-print(sha1("file/566-1191-1-PB.pdf"))
+Data = data()
+print (Data.select_all_data())
