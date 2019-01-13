@@ -94,15 +94,15 @@ class MyFrame1(wx.Frame):
 
     # Virtual event handlers, overide them in your derived class
     def scan_devices(self, event):
-        # players = [['Tendulkar', '15000', '100'],['Dravid', '14000', '1'],
-        #            ['Kumble', '1000', '700'],['KapilDev', '5000', '400'],
-        #            ['Ganguly', '8000', '50']]
-        # for i in players:
-        #     index = self.list.InsertItem(sys.maxint, i[0])
-        #     self.list.SetItem(index, 1, i[1])
-        #     self.list.SetItem(index, 2, i[2])
-        # event.Skip()
-        # self.commandsResult.WriteText(str(index))
+        players = [['Tendulkar', '15000', '100'],['Dravid', '14000', '1'],
+                   ['Kumble', '1000', '700'],['KapilDev', '5000', '400'],
+                   ['Ganguly', '8000', '50']]
+        for i in players:
+            index = self.list.InsertItem(sys.maxint, i[0])
+            self.list.SetItem(index, 1, i[1])
+            self.list.SetItem(index, 2, i[2])
+        event.Skip()
+        self.commandsResult.WriteText(str(index))
 
         adult(None).Show()
 

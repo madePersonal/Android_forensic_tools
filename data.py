@@ -31,7 +31,75 @@ class data(object):
 
     def select_all_data(self):
         try:
-            query = "SELECT * FROM directory, file WHERE directory.id_directory=file.id_directory"
+            select = "SELECT directory.name as loc, directory.id_directory, file.name as file, file.permisison, file.Size, file.date"
+            frm = " FROM directory, file"
+            where = " WHERE directory.id_directory=file.id_directory"
+            self.cur.execute(select+frm+where)
+            self.__result = self.cur.fetchall()
+            return self.__result
+        except Exception as e:
+            self.__error = e.args[0]
+            return self.__error
+
+    def select_by_extention(self, ext):
+        try:
+            select = "SELECT directory.name as loc, directory.id_directory, file.name as file, file.permisison, file.Size, file.date"
+            frm = " FROM directory, file"
+            where = " WHERE directory.id_directory=file.id_directory and file.name like'%"+ext+"%'"
+            self.cur.execute(select+frm+where)
+            self.__result = self.cur.fetchall()
+            return self.__result
+        except Exception as e:
+            self.__error = e.args[0]
+            return self.__error
+
+    def insert_dir(self, dir):
+        try:
+            self.cur.execute('INSERT INTO `directory` (`name`) VALUES ("%s")' % (dir))
+            self.con.commit()
+        except Exception as e :
+            self.__error=e.args[0]
+            return  self.__error
+
+    def insert_sub_dir(self, id_dir, name):
+        try:
+            self.cur.execute('INSERT INTO `sub_directory` (`id_directory`,`name`) VALUES (%s,"%s")' % (id_dir, name))
+            self.con.commit()
+        except Exception as e :
+            self.__error=e.args[0]
+            return self.__error
+
+    def insert_file(self, id_dir, name):
+        try:
+            self.cur.execute('INSERT INTO `file` (`id_directory`,`name`) VALUES (%s,"%s")' % (id_dir, name))
+            self.con.commit()
+        except Exception as e :
+            self.__error=e.args[0]
+            return self.__error
+
+    def select_name_by_id_dir(self, id_dir):
+        try:
+            query = 'SELECT `name` FROM sub_directory WHERE id_directory =%s'%(id_dir)
+            self.cur.execute(query)
+            self.__result = self.cur.fetchall()
+            return self.__result
+        except Exception as e:
+            self.__error = e.args[0]
+            return self.__error
+
+    def select_name_dir_subDir(self, id_dir):
+        try:
+            query = 'SELECT directory.`name`, sub_directory.name FROM sub_directory, `directory` WHERE sub_directory.id_directory and directory.id_directory=%s' %(id_dir)
+            self.cur.execute(query)
+            self.__result = self.cur.fetchall()
+            return self.__result
+        except Exception as e:
+            self.__error = e.args[0]
+            return self.__error
+
+    def select_id_dir_by_name(self, name):
+        try:
+            query = 'SELECT `id_directory` FROM directory WHERE name ="%s"'%(name)
             self.cur.execute(query)
             self.__result = self.cur.fetchall()
             return self.__result

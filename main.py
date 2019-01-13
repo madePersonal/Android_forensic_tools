@@ -6,10 +6,11 @@
 ##
 ## PLEASE DO "NOT" EDIT THIS FILE!
 ###########################################################################
-
+import sys
 import wx
 import wx.richtext
 from pyand import ADB, Fastboot
+from data import data
 
 
 ###########################################################################
@@ -18,6 +19,7 @@ from pyand import ADB, Fastboot
 
 class Main(wx.Frame):
     __adb = ADB()
+    __data = data()
 
     def __init__(self, parent):
         wx.Frame.__init__(self, parent, id=wx.ID_ANY, title=wx.EmptyString, pos=wx.DefaultPosition,
@@ -67,11 +69,11 @@ class Main(wx.Frame):
         self.Centre(wx.BOTH)
 
         # table header
-        self.listFile.InsertColumn(0, 'name', width=150)
-        self.listFile.InsertColumn(1, 'last modifay', wx.LIST_FORMAT_CENTER, 150)
-        self.listFile.InsertColumn(2, 'size', wx.LIST_FORMAT_CENTER, 150)
-        self.listFile.InsertColumn(3, 'owner', wx.LIST_FORMAT_CENTER, 150)
-        self.listFile.InsertColumn(4, 'permission', wx.LIST_FORMAT_CENTER, 150)
+        self.listFile.InsertColumn(0, 'lokasi', width=150)
+        self.listFile.InsertColumn(1, 'file', wx.LIST_FORMAT_CENTER, 150)
+        self.listFile.InsertColumn(2, 'permission', wx.LIST_FORMAT_CENTER, 150)
+        self.listFile.InsertColumn(3, 'size', wx.LIST_FORMAT_CENTER, 150)
+        self.listFile.InsertColumn(4, 'date', wx.LIST_FORMAT_CENTER, 150)
 
         # Connect Events
         self.btn_detectDevice.Bind(wx.EVT_BUTTON, self.detect_device)
@@ -87,16 +89,29 @@ class Main(wx.Frame):
         try:
             device = self.__adb.get_devices()
             self.__adb.set_target_by_id(0)
-            model = self.__adb.get_model()
-            version = self.__adb.get_version()
-            serial = self.__adb.get_serialno()
-            result = "Model :" + model + "\n" + "Devices :" + str(device[0]) + "\n" + "Version :" + version + "\n" + "Serial No :" + serial
+
+            device_manufaktur = self.__adb.shell_command("getprop | grep manufacturer")
+            and_version = self.__adb.shell_command("getprop | grep version.release")
+            model = self.__adb.shell_command("getprop | grep model")
+            name = self.__adb.shell_command("getprop | grep name")
+            brand = self.__adb.shell_command("getprop | grep brand")
+            build_id = self.__adb.shell_command("getprop | grep build.id")
+            serial = self.__adb.shell_command("getprop | grep ro.serial")
+
+            result = device_manufaktur+model+and_version+name+brand+build_id+serial
             self.txtview_deviceInfo.WriteText(result)
         except:
             self.txtview_deviceInfo.WriteText("[!] No Device/emulator found")
         event.Skip()
 
     def full_scan(self, event):
+        data = self.__data.select_all_data()
+        for i in data:
+            index = self.listFile.InsertItem(sys.maxint, i[0])
+            self.listFile.SetItem(index, 1, str(i[2]))
+            self.listFile.SetItem(index, 2, i[2])
+            # self.listFile.SetItem(index, 3, i[4])
+            # self.listFile.SetItem(index, 4, i[5])
         event.Skip()
 
     def sdcard_scan(self, event):

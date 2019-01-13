@@ -1,5 +1,8 @@
 # import pymysql
-# from pyand import ADB
+import subprocess
+import sys
+from pyand import ADB
+from data import data
 #
 # adb = ADB()
 # adb = ADB()
@@ -32,6 +35,37 @@
 # text = adb.shell_command('ls / -l')
 #
 # print(creat_array(text))
+
+# line = file.split('\n')
+# y = (str(line[3]).split(' '))
+# # hasil =" ".join(line)
+# y.remove('')
+# print(y)
+
+# def read_line(string):
+#     n =0
+#     asu ={}
+#     line = string.split("\n")
+#     for l in line:
+#         asu[n] = line[n]
+#         re = arr.array(str(asu[n]).split(''))
+#         n = n + 1
+#     print(re[0])
+
+#clean_db()
+
+# cur.execute('SELECT directory.`name`, sub_directory.name FROM sub_directory, `directory` WHERE sub_directory.id_directory=directory.id_directory AND directory.name = "%s"'%(dir+u[0]))
+        # new_dir_name = cur.fetchone()
+        # new_dir.append(new_dir_name[0]+new_dir_name[1])
+        #
+        # for h in new_dir :
+        #     insertToDB2(h[0])
+
+# cur.execute('SELECT `id_directory` FROM directory WHERE name ="%s"'%(dir))
+    # id= cur.fetchone()
+    # for k in id :
+    #     id_dir =k
+
 import sqlite3
 import hashlib
 from data import data
@@ -71,5 +105,16 @@ def sha1(file):
         hasher.update(buf)
     return hasher.hexdigest()
 
-Data = data()
-print (Data.select_all_data())
+data = data()
+# ext =".usage"
+# where = " WHERE directory.id_directory=file.id_directory AND file.name like'%"+ext+"%'"
+# name = data.select_name_dir_subDir(3)
+# for u in name:
+#     print(u[0]+u[1])
+
+id=data.select_id_dir_by_name("/")
+for k in id:
+    print(k)
+    print(data.select_name_by_id_dir(k))
+
+# print(data.select_all_data())
