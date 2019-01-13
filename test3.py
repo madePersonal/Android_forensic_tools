@@ -4,12 +4,12 @@ import sys
 from pyand import ADB
 from data import data
 #
-# adb = ADB()
-# adb = ADB()
-# dev = adb.get_devices()
-# adb.set_target_by_id(0)
-# adb.get_target_device()
-# serial= adb.get_serialno()
+adb = ADB()
+adb = ADB()
+dev = adb.get_devices()
+adb.set_target_by_id(0)
+adb.get_target_device()
+serial= adb.get_serialno()
 #
 # # con = pymysql.connect(host='localhost', port=3306, user='root', passwd='', db='andr_forensic_tools')
 # # cur = con.cursor()
@@ -18,19 +18,19 @@ from data import data
 # # new_dir_name = cur.fetchone()
 # #
 # # print(new_dir_name)
-# def creat_array(text):
-#     n= 0
-#     o = []
-#     line = text.split("\n")
-#     for l in line:
-#         y = (str(line[n]).split(" "))
-#         h = filter(None, y)
-#         if '->' in h:
-#             h.remove('->')
-#         o.append(h)
-#         n = n + 1
-#     del o[0]
-#     return o
+def creat_array(text):
+    n= 0
+    o = []
+    line = text.split("\n")
+    for l in line:
+        y = (str(line[n]).split(" "))
+        h = filter(None, y)
+        if '->' in h:
+            h.remove('->')
+        o.append(h)
+        n = n + 1
+    del o[0]
+    return o
 #
 # text = adb.shell_command('ls / -l')
 #
@@ -112,9 +112,57 @@ data = data()
 # for u in name:
 #     print(u[0]+u[1])
 
-id=data.select_id_dir_by_name("/")
-for k in id:
-    print(k)
-    print(data.select_name_by_id_dir(k))
+#dir_name = data.select_name_dir_subDir(2)
 
+def creat_array(text):
+    n= 0
+    o = []
+    line = text.split("\n")
+    for l in line:
+        y = (str(line[n]).split(" "))
+        h = filter(None, y)
+        if '->' in h:
+            h.remove('->')
+
+        o.append(h)
+        n = n + 1
+    del o[0]
+    return o
+
+def insertToDB2(dir):
+    id_dir = ""
+    data.insert_dir(dir)
+    id=data.select_id_dir_by_name(dir)
+    for k in id:
+        id_dir = k[0]
+        print(k)
+
+    text = adb.shell_command('ls ' +dir+ ' -l')
+    array = creat_array(text)
+    print(array)
+
+    a = len(array)
+    if a > 1:
+        n = 0
+        for l in array:
+            permmisison = array[n][0] #permisison berada pada indek ke 0
+            if "d" == permmisison[:1]: #mencocokan kode pada huruf awal permisison (d berarti direktori)
+                data.insert_sub_dir(id_dir,"/")
+                print ("hai d")
+            elif "-" == permmisison[:1]:#mencocokan kode pada huruf awal permisison (- berarti file)
+                data.insert_file(id_dir, "/")
+                print("hai -")
+            if n < (a-2) :
+                n = n + 1
+            else:
+                break
 # print(data.select_all_data())
+# insertToDB2("/acct/")
+# text = adb.shell_command('ls ' +"/acct/"+ ' -l')
+# array = creat_array(text)
+# name = array[1][7]+"/"
+# data.insert_sub_dir(2,name)
+#data.insert_file(1, "haik")
+data.clean_db()
+# d=data.select_id_dir_by_name("/acct/")
+# print(d)
