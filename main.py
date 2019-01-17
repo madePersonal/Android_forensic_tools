@@ -11,6 +11,7 @@ import wx
 import wx.richtext
 from pyand import ADB, Fastboot
 from data import data
+from scan import scan
 
 
 ###########################################################################
@@ -19,7 +20,6 @@ from data import data
 
 class Main(wx.Frame):
     __adb = ADB()
-    __data = data()
 
     def __init__(self, parent):
         wx.Frame.__init__(self, parent, id=wx.ID_ANY, title=wx.EmptyString, pos=wx.DefaultPosition,
@@ -105,19 +105,19 @@ class Main(wx.Frame):
         event.Skip()
 
     def full_scan(self, event):
-        data = self.__data.select_all_data()
-        for i in data:
-            index = self.listFile.InsertItem(sys.maxint, i[0])
-            self.listFile.SetItem(index, 1, str(i[2]))
-            self.listFile.SetItem(index, 2, i[2])
-            # self.listFile.SetItem(index, 3, i[4])
-            # self.listFile.SetItem(index, 4, i[5])
-        event.Skip()
+        # data = self.__data.select_all_data()
+        # for i in data:
+        #     index = self.listFile.InsertItem(sys.maxint, i[0])
+        #     self.listFile.SetItem(index, 1, str(i[2]))
+        #     self.listFile.SetItem(index, 2, i[2])
+        #     # self.listFile.SetItem(index, 3, i[4])
+        #     # self.listFile.SetItem(index, 4, i[5])
+        scan(None).Show()
 
     def sdcard_scan(self, event):
         event.Skip()
 
 if __name__ == '__main__' :
-  app = wx.App()
+  app = wx.App(False)
   appFrame = Main(None).Show()
   app.MainLoop()

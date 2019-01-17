@@ -54,7 +54,6 @@ def insertToDB(dir):
             try :
                 for u in dir_name:
                     insertToDB2(u[0]+u[1])
-                    print("pemanggilan proses 2")
             except Exception as e:
                 print(e.args[0])
                 break
@@ -84,7 +83,7 @@ def insertToDB2(dir):
             else:
                 break
 
-insertToDB("/")
+insertToDB("/vendor")
 #data.clean_db()
 
 
