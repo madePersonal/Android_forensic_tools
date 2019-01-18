@@ -4,7 +4,7 @@ class data(object):
     __error = None
     __result = None
     try:
-        con = sqlite3.connect("andr_forensic_tools.db")
+        con = sqlite3.connect("andr_forensic_tools.db", check_same_thread = False)
         cur = con.cursor()
     except Exception as e:
         print(e.message)

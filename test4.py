@@ -2,9 +2,12 @@ from pyand import ADB
 from data import data
 
 adb = ADB()
-dev = adb.get_devices()
-adb.set_target_by_id(0)
-data = data()
+data =data()
+try:
+    adb.get_devices()
+    adb.set_target_by_id(0)
+except Exception as e:
+    print(e.args[0])
 
 text = adb.shell_command("ls /vendor -R -l")
 
@@ -46,23 +49,16 @@ def count_file(array):
 
 def insert_to_db(array):
     n = 0
-    result = []
     for i in array:
         per = array[n][0]
         if per.endswith(":"):
             id_dir=None
             data.insert_dir(array[n][0])
-            id=data.select_id_dir_by_name(array[n][0])
+            id=data.select_id_dir_by_name(array[n][-1])
             id_dir=id[0][0]
+            print("sat")
         elif per[:1] == "-":
-            data.insert_file(id_dir, array[n][7])
+            data.insert_file(id_dir, array[n][-1])
         n = n + 1
 
-# # hasil = insert_to_db(arr)
-# # hasil2 = count_file(arr)
-clean = clean_array(arr)
-b=0
-for l in clean :
-    print(clean[b])
-    b=b+1
-# insert_to_db(arr)
+insert_to_db(arr)

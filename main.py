@@ -113,6 +113,7 @@ class Main(wx.Frame):
         #     # self.listFile.SetItem(index, 3, i[4])
         #     # self.listFile.SetItem(index, 4, i[5])
         scan(None).Show()
+        event.Skip()
 
     def sdcard_scan(self, event):
         event.Skip()
