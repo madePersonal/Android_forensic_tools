@@ -31,7 +31,7 @@ class data(object):
 
     def select_all_data(self):
         try:
-            select = "SELECT directory.name as loc, directory.id_directory, file.name as file, file.permisison, file.Size, file.date"
+            select = "SELECT directory.name as loc, directory.id_directory, file.name as file, file.permision, file.Size, file.date"
             frm = " FROM directory, file"
             where = " WHERE directory.id_directory=file.id_directory"
             self.cur.execute(select+frm+where)
@@ -43,7 +43,7 @@ class data(object):
 
     def select_by_extention(self, ext):
         try:
-            select = "SELECT directory.name as loc, directory.id_directory, file.name as file, file.permisison, file.Size, file.date"
+            select = "SELECT directory.name as loc, directory.id_directory, file.name as file, file.permision, file.Size, file.date"
             frm = " FROM directory, file"
             where = " WHERE directory.id_directory=file.id_directory and file.name like'%"+ext+"%'"
             self.cur.execute(select+frm+where)
@@ -69,9 +69,9 @@ class data(object):
             self.__error=e.args[0]
             return self.__error
 
-    def insert_file(self, id_dir, name):
+    def insert_file(self, id_dir, name, permision, date, size):
         try:
-            self.cur.execute('INSERT INTO `file` (`id_directory`,`name`) VALUES (%s,"%s")' % (id_dir, name))
+            self.cur.execute('INSERT INTO `file` (`id_directory`,`name`, `permision`, `date`, `size`) VALUES (%s,"%s", "%s", "%s", "%s")' % (id_dir, name, permision, date, size))
             self.con.commit()
         except Exception as e :
             self.__error=e.args[0]

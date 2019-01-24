@@ -2,6 +2,7 @@ import time
 from threading import *
 import wx
 
+
 # Button definitions
 ID_START = wx.NewId()
 ID_STOP = wx.NewId()

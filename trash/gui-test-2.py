@@ -9,7 +9,7 @@
 import sys
 import wx
 import wx.richtext
-from adult import adult
+from trash.adult import adult
 
 
 ###########################################################################

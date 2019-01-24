@@ -2,6 +2,7 @@
 import subprocess
 import sys
 from pyand import ADB
+import decimal
 from data import data
 #
 adb = ADB()
@@ -137,7 +138,7 @@ def creat_array(text):
 # name = array[1][7]+"/"
 # data.insert_sub_dir(2,name)
 #data.insert_file(1, "haik")
-# data.clean_db()
+data.clean_db()
 # d=data.select_id_dir_by_name("/acct/")
 # print(d)
 # r = adb.shell_command("ls /vendor -R -l")
@@ -161,13 +162,11 @@ def creat_array(text):
 # data = creat_array(r)
 # print(data[3][0])
 
-# w = ["f", "g", "f", "e", "k"]
+w = []
+b = len(w)
+print(b)
+# r = float(2343)
+# p = (float(2341)/r)
+# f = p*100
 #
-# print(w[-5])
-
-def test():
-    e ="hai"
-    y="yo"
-    return e, y
-
-print(test()[1])
+# print(round(f, 2))
