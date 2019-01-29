@@ -29,11 +29,11 @@ class data(object):
             self.__error = e.args[0]
             return self.__error
 
-    def select_all_data(self):
+    def select_all_data(self, order):
         try:
             select = "SELECT directory.name as loc, directory.id_directory, file.name as file, file.permision, file.Size, file.date"
             frm = " FROM directory, file"
-            where = " WHERE directory.id_directory=file.id_directory"
+            where = " WHERE directory.id_directory=file.id_directory ORDER BY "+order+" DESC"
             self.cur.execute(select+frm+where)
             self.__result = self.cur.fetchall()
             return self.__result
@@ -41,11 +41,11 @@ class data(object):
             self.__error = e.args[0]
             return self.__error
 
-    def select_by_extention(self, ext):
+    def select_by_extention(self, ext, order):
         try:
             select = "SELECT directory.name as loc, directory.id_directory, file.name as file, file.permision, file.Size, file.date"
             frm = " FROM directory, file"
-            where = " WHERE directory.id_directory=file.id_directory and file.name like'%"+ext+"%'"
+            where = " WHERE directory.id_directory=file.id_directory and file.name like'%"+ext+"%' ORDER BY "+order+" DESC"
             self.cur.execute(select+frm+where)
             self.__result = self.cur.fetchall()
             return self.__result
@@ -107,3 +107,14 @@ class data(object):
             self.__error = e.args[0]
             return self.__error
 
+    def search(self, key, order):
+        try:
+            select = "SELECT directory.name as loc, directory.id_directory, file.name as file, file.permision, file.Size, file.date"
+            frm = " FROM directory, file"
+            where = " WHERE directory.id_directory=file.id_directory AND file.name like'%"+key+"%'"+" OR file.date like'%"+key+"%'"+" OR directory.name like'%"+key+"%' ORDER BY "+order+" DESC"
+            self.cur.execute(select+frm+where)
+            self.__result = self.cur.fetchall()
+            return self.__result
+        except Exception as e:
+            self.__error = e.args[0]
+            return self.__error

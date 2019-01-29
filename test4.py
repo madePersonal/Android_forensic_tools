@@ -9,7 +9,7 @@ try:
 except Exception as e:
     print(e.args[0])
 
-text = adb.shell_command("ls /sdcard/ -laRt")
+text = adb.shell_command("ls /storage/sdcard1/ -lRt")
 
 def create_array(text):
     n = 0
@@ -31,7 +31,7 @@ def clean_array(array):
         lengt = len(array[n])
         if lengt!=0:
             per = array[n][0]
-            if lengt >=1 and lengt!=2 and per!= "ls:":
+            if lengt >=1 and per!="total" and per!= "ls:":
                 result.append(array[n])  # menghapus araay yang kosong
         n = n+1
     return result
@@ -54,14 +54,15 @@ def insert_to_db(array):
     for i in array:
         name = []
         per = array[n][0]
-        if per.endswith(":"):
+        if per[:1]=="/":
             id_dir=None
-            data.insert_dir(array[n][0])
-            id=data.select_id_dir_by_name(array[n][-1])
+            dir = " ".join(str(x) for x in array[n])
+            data.insert_dir(dir)
+            id=data.select_id_dir_by_name(dir)
         elif per[:1] == "-":
             id_dir = id[0][0]
             if len(array[n])>8: #jika nama file berisi spasi
-                j = 7
+                j = 6
                 while j <= len(array[n])-1:
                     name.append(array[n][j])
                     j = j + 1
@@ -75,27 +76,13 @@ def insert_to_db(array):
 
 d = create_array(text)
 r = clean_array(d)
-insert_to_db(r)
+# insert_to_db(r)
 
-# # # c = count_file(r)
-# h =0
-# name=[]
-# for i in r :
-#     name=[]
-#     l = len(r[h])
-#     if l > 8:
-#         j = 7
-#         while j <= l-1:
-#             # sub=None
-#             # sub = r[h][j]
-#             # name = name+sub
-#             name.append(r[h][j])
-#             j = j + 1
-#             # print(name)
-#         n = name
-#         u = " ".join(str(x) for x in n)
-#         print(u)
-#         # print(r[h][7]+" "+r[h][8])
-#     h=h+1
-
-# print(c)
+u =0
+for i in r:
+    per = r[u][0]
+    if per[:1]=="-":
+        # if len(r[u]) > 8:
+        #     print(r[u])
+        print(r[u])
+    u=u+1

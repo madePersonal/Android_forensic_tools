@@ -81,7 +81,7 @@ class ScanFrame(wx.Frame):
     def stop_scan(self, event):
         if self.worker:
             self.status.SetLabel("Stoped..")
-            self.worker.abort()
+            scanRecursive(self).abort()
 
     def OnResult(self, event):
         self.prgsBar_scan.SetRange(0)
@@ -90,10 +90,10 @@ class ScanFrame(wx.Frame):
     def OnProgress(self, event):
         r = float(self.prgsBar_scan.GetRange())
         v = float(event.val)
-        p = (v/r)*100
+        p = (v/r)*100.0
         self.status.SetLabel(str(round(p,2))+"%")
         self.prgsBar_scan.SetValue(event.val)
 
     def OnError(self, event):
-        self.worker.abort()
+        scanRecursive(self).abort()
         wx.MessageBox(str(event.error), 'Warning', wx.OK | wx.ICON_WARNING)

@@ -2,15 +2,14 @@
 import subprocess
 import sys
 from pyand import ADB
+from os.path import *
 import decimal
 from data import data
 #
 adb = ADB()
-adb = ADB()
 dev = adb.get_devices()
-adb.set_target_by_id(0)
-adb.get_target_device()
-serial= adb.get_serialno()
+paring = adb.set_target_by_id(0)
+
 #
 # # con = pymysql.connect(host='localhost', port=3306, user='root', passwd='', db='andr_forensic_tools')
 # # cur = con.cursor()
@@ -138,7 +137,7 @@ def creat_array(text):
 # name = array[1][7]+"/"
 # data.insert_sub_dir(2,name)
 #data.insert_file(1, "haik")
-data.clean_db()
+# data.clean_db()
 # d=data.select_id_dir_by_name("/acct/")
 # print(d)
 # r = adb.shell_command("ls /vendor -R -l")
@@ -162,11 +161,22 @@ data.clean_db()
 # data = creat_array(r)
 # print(data[3][0])
 
-w = []
-b = len(w)
-print(b)
 # r = float(2343)
 # p = (float(2341)/r)
 # f = p*100
 #
 # print(round(f, 2))
+# print(paring)
+path = abspath(join(dirname(__file__), '/sdcard/download/COBIT 5 tnda biru.docx '))
+print path
+args=['adb', 'shell', 'md5sum', '-b', '"/sdcard/Download/COBIT 5 tnada biru.docx"']
+s = subprocess.Popen(args, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+print(s.communicate())
+# d = adb.run_cmd("pull /storage/sdcard1/data kejahatan/pengesahan.pdf /Users/sartika/Documents")
+# print (d)
+
+
+
+# hash2 = sha1("/Users/sartika/Documents/1504505037_KP.docx")
+# hash_asli="bdc1ce95f6676e1bb0d6a48ddb53ae38b7608d6f"
+# print(hash2+"\n"+hash_asli)

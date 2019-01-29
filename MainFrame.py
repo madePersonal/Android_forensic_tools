@@ -59,22 +59,52 @@ class MainFrame(wx.Frame):
 
         bSizer1.Add(gSizer1, 1, wx.EXPAND, 5)
 
+        fgSizer1 = wx.FlexGridSizer(1, 6, 0, 0)
+        fgSizer1.SetFlexibleDirection(wx.BOTH)
+        fgSizer1.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
+
+        self.label_file_type = wx.StaticText(self, wx.ID_ANY, u"file type", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.label_file_type.Wrap(-1)
+        fgSizer1.Add(self.label_file_type, 0, wx.ALL, 5)
+
         file_extChoices = [u"all file", u"MP4", u"MP3", u"PDF", u"doc", u"MKV", u"log"]
         self.file_ext = wx.Choice(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, file_extChoices, 0)
         self.file_ext.SetSelection(0)
-        bSizer1.Add(self.file_ext, 0, wx.ALL, 5)
+        fgSizer1.Add(self.file_ext, 0, wx.ALL, 5)
+
+        self.label_short_by = wx.StaticText(self, wx.ID_ANY, u"short by", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.label_short_by.Wrap(-1)
+        fgSizer1.Add(self.label_short_by, 0, wx.ALL, 5)
+
+        shortBy_choiceChoices = [u"size", u"date"]
+        self.shortBy_choice = wx.Choice(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, shortBy_choiceChoices, 0)
+        self.shortBy_choice.SetSelection(0)
+        fgSizer1.Add(self.shortBy_choice, 0, wx.ALL, 5)
+
+        self.txtctrl_search = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0)
+        fgSizer1.Add(self.txtctrl_search, 0, wx.ALL | wx.ALIGN_RIGHT, 5)
+
+        self.btn_search = wx.Button(self, wx.ID_ANY, u"search", wx.Point(-1, -1), wx.DefaultSize, wx.BU_RIGHT)
+        fgSizer1.Add(self.btn_search, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_RIGHT, 5)
+
+        bSizer1.Add(fgSizer1, 0, wx.EXPAND, 5)
 
         self.listFile = wx.ListCtrl(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT)
         bSizer1.Add(self.listFile, 1, wx.ALL | wx.EXPAND, 5)
 
         self.SetSizer(bSizer1)
         self.Layout()
-        self.menubar1 = wx.MenuBar(0)
-        self.SetMenuBar(self.menubar1)
 
         self.Centre(wx.BOTH)
 
         self.worker = None
+
+        #popup menu
+        ID_MENU1 = wx.NewId()
+        ID_MENU2 = wx.NewId()
+        self.menu=wx.Menu()
+        self.menu.Append(ID_MENU1, "view hash")
+        self.menu.Append(ID_MENU2, "pull")
 
         # table header
         self.listFile.InsertColumn(0, 'lokasi', width=250)
@@ -88,11 +118,17 @@ class MainFrame(wx.Frame):
         self.btn_scan.Bind(wx.EVT_BUTTON, self.show_scan)
         self.btn_viewData.Bind(wx.EVT_BUTTON, self.view_all_data)
         self.file_ext.Bind(wx.EVT_CHOICE, self.view_data_by_ext)
+        self.btn_search.Bind(wx.EVT_BUTTON, self.search_data)
+        self.listFile.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, self.item_right_click)
+        self.Bind(wx.EVT_MENU, self.view_hash, id=ID_MENU1)
+        self.Bind(wx.EVT_MENU, self.pull_file, id=ID_MENU2)
 
+        #connect event main class
         DATA_RESULT(self, self.ParsingData)
         RANGE_RESULT(self, self.OnResult)
         PROGRESS_RESULT(self, self.OnProgress)
         ERROR_RESULT(self, self.OnError)
+        HASH_RESULT(self, self.OnHashResult)
 
     def __del__(self):
         pass
@@ -120,16 +156,52 @@ class MainFrame(wx.Frame):
 
     def show_scan(self, event):
         ScanFrame(None).Show()
+        event.Skip()
 
     def view_data_by_ext(self, event):
         self.listFile.DeleteAllItems()
         d=self.file_ext.GetStringSelection()
-        main(self).runSelectByExt(ext=d)
+        order = self.short_by()
+        main(self).runSelectByExt(ext=d, order=order)
+        event.Skip()
+
+    def short_by(self):
+        key = self.shortBy_choice.GetCurrentSelection()
+        if key == 0:
+            key="file.size"
+        elif key == 1:
+            key = "file.date"
+        return key
 
     def view_all_data(self, event):
         if not self.worker:
+            order = self.short_by()
             self.listFile.DeleteAllItems()
-            self.worker = main(self).runSelectAll()
+            self.worker = main(self).runSelectAll(order)
+        event.Skip()
+
+    def search_data(self, event):
+        self.listFile.DeleteAllItems()
+        text = self.txtctrl_search.GetValue()
+        order = self.short_by()
+        if text !=" " and text!="":
+            main(self).runSearchData(text, order)
+        event.Skip()
+
+    def item_right_click(self, event):
+        self.PopupMenu(self.menu)
+
+    def view_hash(self, event):
+        row = self.listFile.GetFocusedItem()
+        name = self.listFile.GetItem(itemIdx=row, col=1).GetText()
+        loc = self.listFile.GetItem(itemIdx=row, col=0).GetText()
+        file = loc.replace(":", "/")+name
+        main(self).runHashFile(file)
+        event.Skip()
+
+    def pull_file(self, event):
+        print("ini pull")
+        event.Skip()
 
     def ParsingData(self, event):
         data = event.data
@@ -140,13 +212,17 @@ class MainFrame(wx.Frame):
         self.listFile.SetItem(index, 4, str(data[5]))
 
     def OnResult(self, event):
-        self.progress_bar.ClearBackground()
+        self.progress_bar.SetRange(0)
         self.progress_bar.SetRange(event.range)
 
+    def OnHashResult(self, event):
+        dialog = wx.RichMessageDialog(self, "file: "+event.hash[2]+"\n\n"+"md5: "+event.hash[0]+"sha1: "+event.hash[1],"file hash")
+        dialog.ShowModal()
+
     def OnProgress(self, event):
-        r = self.progress_bar.GetRange()
-        v = event.val
-        p = (float(v)/float(r))*float(100)
+        r = float(self.progress_bar.GetRange())
+        v = float(event.val)
+        p =v/r*100.0
         self.view_progress.SetLabel(str(round(p, 1))+"%")
         self.progress_bar.SetValue(event.val)
 

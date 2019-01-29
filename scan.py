@@ -36,7 +36,7 @@ class ErrorEvent(wx.PyEvent):
         self.error = error
 
 class scanRecursive(Thread):
-    __progress_value = 1
+    __progress_value = -1
 
     def __init__(self, notify_window):
         Thread.__init__(self)
@@ -58,7 +58,7 @@ class scanRecursive(Thread):
         except Exception as e:
             self.errorHandler(e.args[0])
 
-        cmd_result = ADB().shell_command("ls "+dir+" -R -l")
+        cmd_result = ADB().shell_command("ls "+dir+" -lR")
         if self._want_abort:
             sys.exit()
         array = self.create_array(cmd_result)
@@ -68,6 +68,7 @@ class scanRecursive(Thread):
         if self._want_abort:
             sys.exit()
         range = self.count_file(arr)
+        print(range)
         if self._want_abort:
             sys.exit()
         wx.PostEvent(self._notify_window, RangeEvent(range))
@@ -75,6 +76,7 @@ class scanRecursive(Thread):
 
     def updateProgress(self):
         self.__progress_value=self.__progress_value+1
+        print(self.__progress_value)
         wx.PostEvent(self._notify_window, ProgressEvent(self.__progress_value))
 
     def errorHandler(self, error):
@@ -102,11 +104,11 @@ class scanRecursive(Thread):
             for i in array:
                 name =[]
                 per = array[n][0]
-                if per.endswith(":"):
+                if per[:1]=="/":
                     id_dir = None
-                    data().insert_dir(array[n][-1])
-                    id = data().select_id_dir_by_name(array[n][-1])
-                    print("dir masuk")
+                    dir = " ".join(str(x) for x in array[n]) #mennghubungkan nama directory yang berisi spasi
+                    data().insert_dir(dir)
+                    id = data().select_id_dir_by_name(dir)
                     self.updateProgress()
                 elif per[:1] == "-":
                     id_dir = id[0][0]
@@ -156,7 +158,7 @@ class scanRecursive(Thread):
                 lengt = len(array[n])
                 if lengt!=0:
                     per = array[n][0]
-                    if lengt >= 1 and lengt != 2  and lengt!=4 and per!="ls:":#menghilangkan array yang kosong dan kata "total"
+                    if lengt >= 1 and per!="total" and per!="ls:":#menghilangkan array yang kosong dan kata "total"
                         result.append(array[n])
                 n = n + 1
                 if self._want_abort:
