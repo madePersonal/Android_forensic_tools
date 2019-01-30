@@ -120,8 +120,8 @@ class main(Thread):
 
     def hash_file(self, file):
         result=[]
-        cmd5=["md5 sum -b", file]
-        cmdsha1=r"sha1sum -b "+file
+        cmd5="md5sum -b "+"'%s'"%file
+        cmdsha1="sha1sum -b "+"'%s'"%file
         try:
             md5 = ADB().shell_command(cmd5)
             sha1 = ADB().shell_command(cmdsha1)

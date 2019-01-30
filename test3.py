@@ -167,13 +167,9 @@ def creat_array(text):
 #
 # print(round(f, 2))
 # print(paring)
-path = abspath(join(dirname(__file__), '/sdcard/download/COBIT 5 tnda biru.docx '))
-print path
-args=['adb', 'shell', 'md5sum', '-b', '"/sdcard/Download/COBIT 5 tnada biru.docx"']
-s = subprocess.Popen(args, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-print(s.communicate())
-# d = adb.run_cmd("pull /storage/sdcard1/data kejahatan/pengesahan.pdf /Users/sartika/Documents")
-# print (d)
+# p=adb.get_jdwp()
+# # d = adb.run_cmd("pull /storage/sdcard1/data kejahatan/pengesahan.pdf /Users/sartika/Documents")
+# print (p)
 
 
 
