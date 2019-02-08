@@ -1,5 +1,3 @@
-import subprocess
-
 from data import data
 import wx.lib.newevent
 from threading import *
@@ -79,12 +77,11 @@ class main(Thread):
     def view_all_data(self, args):
         d = data().select_all_data(args)
         l = len(d)
+        print(l)
         if l !=0:
             wx.PostEvent(self._notify_window, RangeEvent(l))
-            h = 0
             for i in d:
-                wx.PostEvent(self._notify_window, DataEvent(d[h]))
-                h = h+1
+                wx.PostEvent(self._notify_window, DataEvent(i))
                 self.update_progress()
                 time.sleep(0.0005)
         else:
@@ -95,10 +92,8 @@ class main(Thread):
         l = len(d)
         if l!=0:
             wx.PostEvent(self._notify_window, RangeEvent(l))
-            h=0
             for i in d:
-                wx.PostEvent(self._notify_window, DataEvent(d[h]))
-                h = h+1
+                wx.PostEvent(self._notify_window, DataEvent(i))
                 self.update_progress()
                 time.sleep(0.0005)
         else:
@@ -109,10 +104,8 @@ class main(Thread):
         l = len(d)
         if l != 0:
             wx.PostEvent(self._notify_window, RangeEvent(l))
-            h = 0
             for i in d:
-                wx.PostEvent(self._notify_window, DataEvent(d[h]))
-                h = h + 1
+                wx.PostEvent(self._notify_window, DataEvent(i))
                 self.update_progress()
                 time.sleep(0.0005)
         else:
@@ -120,8 +113,8 @@ class main(Thread):
 
     def hash_file(self, file):
         result=[]
-        cmd5="md5sum -b "+"'%s'"%file
-        cmdsha1="sha1sum -b "+"'%s'"%file
+        cmd5="md5sum -b '%s'" % file
+        cmdsha1="sha1sum -b '%s'" % file
         try:
             md5 = ADB().shell_command(cmd5)
             sha1 = ADB().shell_command(cmdsha1)

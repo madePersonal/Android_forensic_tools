@@ -43,13 +43,13 @@ class scanRecursive(Thread):
         self._notify_window = notify_window
         self._want_abort = 0
 
-    def star_thread(self, func, *args):
+    def start_thread(self, func, *args):
         thread = Thread(target=func, args=args)
         thread.setDaemon(True)
         thread.start()
 
     def run_scan(self, dir):
-        self.star_thread(self.scan, dir)
+        self.start_thread(self.scan, dir)
 
     def scan(self, dir):
         try:
@@ -59,6 +59,9 @@ class scanRecursive(Thread):
             self.errorHandler(e.args[0])
 
         cmd_result = ADB().shell_command("ls "+dir+" -lR")
+        if "error: no devices/emulators found" in cmd_result:
+            self.errorHandler("no devices/emulators found")
+            sys.exit()
         if self._want_abort:
             sys.exit()
         array = self.create_array(cmd_result)
@@ -68,7 +71,6 @@ class scanRecursive(Thread):
         if self._want_abort:
             sys.exit()
         range = self.count_file(arr)
-        print(range)
         if self._want_abort:
             sys.exit()
         wx.PostEvent(self._notify_window, RangeEvent(range))
@@ -76,7 +78,6 @@ class scanRecursive(Thread):
 
     def updateProgress(self):
         self.__progress_value=self.__progress_value+1
-        print(self.__progress_value)
         wx.PostEvent(self._notify_window, ProgressEvent(self.__progress_value))
 
     def errorHandler(self, error):
@@ -84,14 +85,11 @@ class scanRecursive(Thread):
 
     def count_file(self, array):
         try:
-            n = 0
             result = []
-            for i in array:
-                per = array[n][0]
+            for arr in array:
+                per = arr[0]
                 if per[:1] == "-" or per[:1] == "d":
-                    result.append(array[n])
-                n = n + 1
-
+                    result.append(arr)
                 if self._want_abort:
                     break
             return len(result)
@@ -99,51 +97,48 @@ class scanRecursive(Thread):
             self.errorHandler(e.args[0])
 
     def insert_to_db(self, array):
-        n = 0
         try:
-            for i in array:
+            for arr in array:
                 name =[]
-                per = array[n][0]
+                per = arr[0]
                 if per[:1]=="/":
                     id_dir = None
-                    dir = " ".join(str(x) for x in array[n]) #mennghubungkan nama directory yang berisi spasi
+                    dir = " ".join(str(x) for x in arr) #mennghubungkan nama directory yang berisi spasi
                     data().insert_dir(dir)
                     id = data().select_id_dir_by_name(dir)
+                    print("dir masuk")
                     self.updateProgress()
                 elif per[:1] == "-":
                     id_dir = id[0][0]
-                    if len(array[n]) > 8:  # jika nama file berisi spasi
+                    if len(arr) > 8:  # jika nama file berisi spasi
                         j = 7
-                        while j <= len(array[n]) - 1:
-                            name.append(array[n][j])
+                        while j <= len(arr) - 1:
+                            name.append(arr[j])
                             j = j + 1
                         na = name
                         u = " ".join(str(x) for x in na)
-                        data().insert_file(id_dir, u, array[n][0], array[n][5], array[n][4])
+                        data().insert_file(id_dir, u, arr[0], arr[5], arr[4])
                         print("file masuk")
                         self.updateProgress()
                     else:
-                        data().insert_file(id_dir, array[n][-1], array[n][0], array[n][5], array[n][4])
+                        data().insert_file(id_dir, arr[-1], arr[0], arr[5], arr[4])
                         print("file masuk")
                         self.updateProgress()
-                n = n + 1
                 if self._want_abort:
                     break
         except Exception as e:
             self.errorHandler(e.args[0])
 
     def create_array(self, text):
-        n = 0
         o = []
         try:
             line = text.split("\n")
             for l in line:
-                y = (str(line[n]).split(" "))
+                y = (str(l).split(" "))
                 h = filter(None, y)
                 if '->' in h:
                     h.remove('->')
                 o.append(h)
-                n = n + 1
                 if self._want_abort:
                     break
             return o
@@ -151,16 +146,14 @@ class scanRecursive(Thread):
             self.errorHandler(e.args[0])
 
     def clean_array(self, array):
-        n = 0
         result = []
         try:
-            for i in array:
-                lengt = len(array[n])
+            for arr in array:
+                lengt = len(arr)
                 if lengt!=0:
-                    per = array[n][0]
+                    per = arr[0]
                     if lengt >= 1 and per!="total" and per!="ls:":#menghilangkan array yang kosong dan kata "total"
-                        result.append(array[n])
-                n = n + 1
+                        result.append(arr)
                 if self._want_abort:
                     break
             return result

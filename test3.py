@@ -114,20 +114,19 @@ data = data()
 
 #dir_name = data.select_name_dir_subDir(2)
 
-def creat_array(text):
-    n= 0
-    o = []
-    line = text.split("\n")
-    for l in line:
-        y = (str(line[n]).split(" "))
-        h = filter(None, y)
-        if '->' in h:
-            h.remove('->')
+def count_file(self, array):
+    try:
+        result = []
+        for arr in array:
+            per = arr[0]
+            if per[:1] == "-" or per[:1] == "d":
+                result.append(arr)
+            if self._want_abort:
+                break
+        return len(result)
+    except Exception as e:
+        self.errorHandler(e.args[0])
 
-        o.append(h)
-        n = n + 1
-    del o[0]
-    return o
 
 
 # print(data.select_all_data())
@@ -137,7 +136,7 @@ def creat_array(text):
 # name = array[1][7]+"/"
 # data.insert_sub_dir(2,name)
 #data.insert_file(1, "haik")
-# data.clean_db()
+data.clean_db()
 # d=data.select_id_dir_by_name("/acct/")
 # print(d)
 # r = adb.shell_command("ls /vendor -R -l")

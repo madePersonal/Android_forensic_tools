@@ -9,7 +9,7 @@ try:
 except Exception as e:
     print(e.args[0])
 
-text = adb.shell_command("ls /storage/sdcard1/ -lRt")
+text = adb.shell_command("ls /sdcard/Android/data/com.google.android.youtube/cache/exo/ -lRt")
 
 def create_array(text):
     n = 0
@@ -40,13 +40,11 @@ def clean_array(array):
 # arr = clean_array(cmd_result)
 
 def count_file(array):
-    n = 0
     result = []
-    for i in array:
-        per = array[n][0]
+    for arr in array:
+        per = arr[0]
         if per[:1] == "-" or per[:1] == "d":
-            result.append(array[n])
-        n = n + 1
+            result.append(arr)
     return len(result)
 
 def insert_to_db(array):
@@ -76,13 +74,7 @@ def insert_to_db(array):
 
 d = create_array(text)
 r = clean_array(d)
-# insert_to_db(r)
 
-u =0
+
 for i in r:
-    per = r[u][0]
-    if per[:1]=="-":
-        # if len(r[u]) > 8:
-        #     print(r[u])
-        print(r[u])
-    u=u+1
+    print(i)

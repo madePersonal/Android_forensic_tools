@@ -69,13 +69,14 @@ class ScanFrame(wx.Frame):
         if not self.worker:
             dir = None
             type = self.scan_type_choice.GetCurrentSelection()
-            self.status.SetLabel("Menghitung direktori, mohon tunggu..")
             if type == 0:
                 dir = "/"
             elif type == 1:
                 dir = "/sdcard/"
             elif type == 2:
                 dir = "/storage/sdcard1/"
+
+            self.status.SetLabel("Menghitung direktori, mohon tunggu..")
             self.worker = scanRecursive(self).run_scan(dir)
 
     def stop_scan(self, event):
@@ -91,8 +92,10 @@ class ScanFrame(wx.Frame):
         r = float(self.prgsBar_scan.GetRange())
         v = float(event.val)
         p = (v/r)*100.0
-        self.status.SetLabel(str(round(p,2))+"%")
+        self.status.SetLabel(str(round(p,1))+"%")
         self.prgsBar_scan.SetValue(event.val)
+        if p == 100.0:
+            self.Destroy()
 
     def OnError(self, event):
         scanRecursive(self).abort()

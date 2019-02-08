@@ -12,6 +12,7 @@ import wx.richtext
 from pyand import *
 from ScanFrame import ScanFrame
 from main import *
+from PullFrame import PullFrame
 import wx.lib.newevent
 
 class MainFrame(wx.Frame):
@@ -99,7 +100,7 @@ class MainFrame(wx.Frame):
 
         self.worker = None
 
-        #popup menu
+        #klik kanan menu
         ID_MENU1 = wx.NewId()
         ID_MENU2 = wx.NewId()
         self.menu=wx.Menu()
@@ -107,11 +108,11 @@ class MainFrame(wx.Frame):
         self.menu.Append(ID_MENU2, "pull")
 
         # table header
-        self.listFile.InsertColumn(0, 'lokasi', width=250)
-        self.listFile.InsertColumn(1, 'file', wx.LIST_FORMAT_CENTER, 150)
-        self.listFile.InsertColumn(2, 'permission', wx.LIST_FORMAT_CENTER, 150)
-        self.listFile.InsertColumn(3, 'size', wx.LIST_FORMAT_CENTER, 150)
-        self.listFile.InsertColumn(4, 'date', wx.LIST_FORMAT_CENTER, 150)
+        self.listFile.InsertColumn(0, 'lokasi', width=290)
+        self.listFile.InsertColumn(1, 'file', wx.LIST_FORMAT_CENTER, 200)
+        self.listFile.InsertColumn(2, 'permission', wx.LIST_FORMAT_CENTER, 100)
+        self.listFile.InsertColumn(3, 'size', wx.LIST_FORMAT_CENTER, 100)
+        self.listFile.InsertColumn(4, 'date', wx.LIST_FORMAT_CENTER, 100)
 
         # Connect Events
         self.btn_detectDevice.Bind(wx.EVT_BUTTON, self.detect_device)
@@ -155,7 +156,7 @@ class MainFrame(wx.Frame):
         event.Skip()
 
     def show_scan(self, event):
-        ScanFrame(None).Show()
+        ScanFrame(self).Show()
         event.Skip()
 
     def view_data_by_ext(self, event):
@@ -200,7 +201,11 @@ class MainFrame(wx.Frame):
         event.Skip()
 
     def pull_file(self, event):
-        print("ini pull")
+        row = self.listFile.GetFocusedItem()
+        name = self.listFile.GetItem(itemIdx=row, col=1).GetText()
+        loc = self.listFile.GetItem(itemIdx=row, col=0).GetText()
+        file = loc.replace(":", "/") + name
+        PullFrame(self,file).Show()
         event.Skip()
 
     def ParsingData(self, event):
