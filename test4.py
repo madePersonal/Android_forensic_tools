@@ -1,5 +1,5 @@
 from pyand import ADB
-from data import data
+from Data import data
 
 adb = ADB()
 data =data()

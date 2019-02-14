@@ -1,11 +1,10 @@
 import wx
-from scan import *
+from Scan import *
 
 class ScanFrame(wx.Frame):
-    __adb = ADB()
 
     def __init__(self, parent):
-        wx.Frame.__init__(self, parent, id=wx.ID_ANY, title=wx.EmptyString, pos=wx.DefaultPosition,
+        wx.Frame.__init__(self, parent, id=wx.ID_ANY, title="scan device", pos=wx.DefaultPosition,
                           size=wx.Size(450, 150), style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
 
         self.SetSizeHintsSz(wx.DefaultSize, wx.DefaultSize)
@@ -28,7 +27,7 @@ class ScanFrame(wx.Frame):
 
         bSizer1.Add(fgSizer2, 0, wx.EXPAND | wx.ALIGN_CENTER_HORIZONTAL, 5)
 
-        self.status = wx.StaticText(self, wx.ID_ANY, u"SCAN", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.status = wx.StaticText(self, wx.ID_ANY, u"", wx.DefaultPosition, wx.DefaultSize, 0)
         self.status.Wrap(-1)
         bSizer1.Add(self.status, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 5)
 
@@ -77,12 +76,12 @@ class ScanFrame(wx.Frame):
                 dir = "/storage/sdcard1/"
 
             self.status.SetLabel("Menghitung direktori, mohon tunggu..")
-            self.worker = scanRecursive(self).run_scan(dir)
+            self.worker = ScanRecursive(self).run_scan(dir)
 
     def stop_scan(self, event):
         if self.worker:
             self.status.SetLabel("Stoped..")
-            scanRecursive(self).abort()
+            ScanRecursive(self).abort()
 
     def OnResult(self, event):
         self.prgsBar_scan.SetRange(0)
@@ -98,5 +97,5 @@ class ScanFrame(wx.Frame):
             self.Destroy()
 
     def OnError(self, event):
-        scanRecursive(self).abort()
+        ScanRecursive(self).abort()
         wx.MessageBox(str(event.error), 'Warning', wx.OK | wx.ICON_WARNING)

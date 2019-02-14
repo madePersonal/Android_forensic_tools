@@ -1,13 +1,15 @@
 import sqlite3
 
-class data(object):
+class Data():
     __error = None
     __result = None
-    try:
-        con = sqlite3.connect("andr_forensic_tools.db", check_same_thread = False)
-        cur = con.cursor()
-    except Exception as e:
-        print(e.message)
+
+    def __init__(self):
+        try:
+            self.con = sqlite3.connect("andr_forensic_tools.db", check_same_thread = False)
+            self.cur = self.con.cursor()
+        except Exception as e:
+            print(e.args[0])
 
     def clean_db(self):
         try:

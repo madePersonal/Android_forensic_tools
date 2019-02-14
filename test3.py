@@ -2,13 +2,15 @@
 import subprocess
 import sys
 from pyand import ADB
+from textwrap import wrap
 from os.path import *
 import decimal
-from data import data
+from Data import Data
+import re
 #
 adb = ADB()
 dev = adb.get_devices()
-paring = adb.set_target_by_id(0)
+# paring = adb.set_target_by_id(0)
 
 #
 # # con = pymysql.connect(host='localhost', port=3306, user='root', passwd='', db='andr_forensic_tools')
@@ -68,7 +70,6 @@ def creat_array(text):
 
 import sqlite3
 import hashlib
-from data import data
 
 try:
     con = sqlite3.connect("andr_forensic_tools.db")
@@ -105,7 +106,7 @@ def sha1(file):
         hasher.update(buf)
     return hasher.hexdigest()
 
-data = data()
+data = Data()
 # ext =".usage"
 # where = " WHERE directory.id_directory=file.id_directory AND file.name like'%"+ext+"%'"
 # name = data.select_name_dir_subDir(3)
@@ -136,7 +137,7 @@ def count_file(self, array):
 # name = array[1][7]+"/"
 # data.insert_sub_dir(2,name)
 #data.insert_file(1, "haik")
-data.clean_db()
+# data.clean_db()
 # d=data.select_id_dir_by_name("/acct/")
 # print(d)
 # r = adb.shell_command("ls /vendor -R -l")
@@ -170,8 +171,19 @@ data.clean_db()
 # # d = adb.run_cmd("pull /storage/sdcard1/data kejahatan/pengesahan.pdf /Users/sartika/Documents")
 # print (p)
 
-
-
 # hash2 = sha1("/Users/sartika/Documents/1504505037_KP.docx")
 # hash_asli="bdc1ce95f6676e1bb0d6a48ddb53ae38b7608d6f"
 # print(hash2+"\n"+hash_asli)
+cat = adb.shell_command("cat /sdcard/Download/Aturan-Draft-Jurnal.docx")
+# cat = "jjhhhnndbbggfjfkfkjmgmmnnchhchdnnkskcmnh123"
+cat_split = wrap(cat, 16)
+result = []
+for k in cat_split:
+    print(k)
+    hex = k.encode("hex")
+    split = wrap(hex, 2)
+    result.append(split)
+
+for g in result:
+    u = "  ".join(str(x) for x in g)
+    print(u)

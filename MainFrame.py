@@ -11,17 +11,18 @@ import wx
 import wx.richtext
 from pyand import *
 from ScanFrame import ScanFrame
-from main import *
+from Main import *
 from PullFrame import PullFrame
+from HexFrame import HexFrame
 import wx.lib.newevent
+import wx.lib.mixins.listctrl as listmix
 
 class MainFrame(wx.Frame):
     __adb = ADB()
-    __data = data()
 
     def __init__(self, parent):
-        wx.Frame.__init__(self, parent, id=wx.ID_ANY, title=wx.EmptyString, pos=wx.DefaultPosition,
-                          size=wx.Size(800, 600), style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
+        wx.Frame.__init__(self, parent, id=wx.ID_ANY, title="andr list and pull file demo - MD Sartika (15074)", pos=wx.DefaultPosition,
+                          size=wx.Size(800, 600), style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL | wx.FRAME_SHAPED)
 
         self.SetSizeHintsSz(wx.DefaultSize, wx.DefaultSize)
 
@@ -90,7 +91,7 @@ class MainFrame(wx.Frame):
 
         bSizer1.Add(fgSizer1, 0, wx.EXPAND, 5)
 
-        self.listFile = wx.ListCtrl(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT)
+        self.listFile = wx.ListCtrl(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT | wx.LC_SORT_ASCENDING)
         bSizer1.Add(self.listFile, 1, wx.ALL | wx.EXPAND, 5)
 
         self.SetSizer(bSizer1)
@@ -103,9 +104,21 @@ class MainFrame(wx.Frame):
         #klik kanan menu
         ID_MENU1 = wx.NewId()
         ID_MENU2 = wx.NewId()
+        ID_MENU3 = wx.NewId()
         self.menu=wx.Menu()
-        self.menu.Append(ID_MENU1, "view hash")
-        self.menu.Append(ID_MENU2, "pull")
+        self.menu.Append(ID_MENU1, "Checksum")
+        self.menu.Append(ID_MENU2, "Pull")
+        self.menu.Append(ID_MENU3, "Hexsum")
+
+        #menu bar
+        REBOOT_ID = wx.NewId()
+        menuBar = wx.MenuBar()
+        toolsMenu = wx.Menu()
+        rebootDeviceItem = toolsMenu.Append(REBOOT_ID, "Reboot device", "status")
+        menuBar.Append(toolsMenu, "&Tools")
+        self.SetMenuBar(menuBar)
+
+
 
         # table header
         self.listFile.InsertColumn(0, 'lokasi', width=290)
@@ -121,8 +134,12 @@ class MainFrame(wx.Frame):
         self.file_ext.Bind(wx.EVT_CHOICE, self.view_data_by_ext)
         self.btn_search.Bind(wx.EVT_BUTTON, self.search_data)
         self.listFile.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, self.item_right_click)
+
         self.Bind(wx.EVT_MENU, self.view_hash, id=ID_MENU1)
         self.Bind(wx.EVT_MENU, self.pull_file, id=ID_MENU2)
+        self.Bind(wx.EVT_MENU, self.hex_sum, id=ID_MENU3)
+
+        self.Bind(wx.EVT_MENU, self.quit, rebootDeviceItem)
 
         #connect event main class
         DATA_RESULT(self, self.ParsingData)
@@ -134,7 +151,6 @@ class MainFrame(wx.Frame):
     def __del__(self):
         pass
 
-    # Virtual event handlers, overide them in your derived class
     def detect_device(self, event):
         self.txtview_deviceInfo.Clear()
         try:
@@ -156,14 +172,15 @@ class MainFrame(wx.Frame):
         event.Skip()
 
     def show_scan(self, event):
-        ScanFrame(self).Show()
+        scan = ScanFrame(None)
+        scan.Show()
         event.Skip()
 
     def view_data_by_ext(self, event):
         self.listFile.DeleteAllItems()
         d=self.file_ext.GetStringSelection()
         order = self.short_by()
-        main(self).runSelectByExt(ext=d, order=order)
+        Main(self).runSelectByExt(ext=d, order=order)
         event.Skip()
 
     def short_by(self):
@@ -178,7 +195,7 @@ class MainFrame(wx.Frame):
         if not self.worker:
             order = self.short_by()
             self.listFile.DeleteAllItems()
-            self.worker = main(self).runSelectAll(order)
+            self.worker = Main(self).runSelectAll(order)
         event.Skip()
 
     def search_data(self, event):
@@ -186,7 +203,7 @@ class MainFrame(wx.Frame):
         text = self.txtctrl_search.GetValue()
         order = self.short_by()
         if text !=" " and text!="":
-            main(self).runSearchData(text, order)
+            Main(self).runSearchData(text, order)
         event.Skip()
 
     def item_right_click(self, event):
@@ -197,7 +214,8 @@ class MainFrame(wx.Frame):
         name = self.listFile.GetItem(itemIdx=row, col=1).GetText()
         loc = self.listFile.GetItem(itemIdx=row, col=0).GetText()
         file = loc.replace(":", "/")+name
-        main(self).runHashFile(file)
+        main = Main(self)
+        main.runHashFile(file)
         event.Skip()
 
     def pull_file(self, event):
@@ -205,8 +223,17 @@ class MainFrame(wx.Frame):
         name = self.listFile.GetItem(itemIdx=row, col=1).GetText()
         loc = self.listFile.GetItem(itemIdx=row, col=0).GetText()
         file = loc.replace(":", "/") + name
-        PullFrame(self,file).Show()
+        pull = PullFrame(None, file)
+        pull.Show()
         event.Skip()
+
+    def hex_sum(self, event):
+        row = self.listFile.GetFocusedItem()
+        name = self.listFile.GetItem(itemIdx=row, col=1).GetText()
+        loc = self.listFile.GetItem(itemIdx=row, col=0).GetText()
+        file = loc.replace(":", "/") + name
+        hex = HexFrame(None, file)
+        hex.Show()
 
     def ParsingData(self, event):
         data = event.data
@@ -215,6 +242,10 @@ class MainFrame(wx.Frame):
         self.listFile.SetItem(index, 2, str(data[3]))
         self.listFile.SetItem(index, 3, str(data[4]))
         self.listFile.SetItem(index, 4, str(data[5]))
+
+    def quit(self, event):
+        self.Close()
+        event.Skip()
 
     def OnResult(self, event):
         self.progress_bar.SetRange(0)

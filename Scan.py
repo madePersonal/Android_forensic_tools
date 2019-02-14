@@ -1,4 +1,4 @@
-from data import data
+from Data import Data
 import wx.lib.newevent
 from pyand import ADB, Fastboot
 from threading import *
@@ -35,13 +35,15 @@ class ErrorEvent(wx.PyEvent):
         self.SetEventType(ERROR_RESULT_ID)
         self.error = error
 
-class scanRecursive(Thread):
+class ScanRecursive(Thread):
     __progress_value = -1
 
     def __init__(self, notify_window):
         Thread.__init__(self)
         self._notify_window = notify_window
         self._want_abort = 0
+        self.adb=ADB()
+        self.data=Data()
 
     def start_thread(self, func, *args):
         thread = Thread(target=func, args=args)
@@ -53,12 +55,12 @@ class scanRecursive(Thread):
 
     def scan(self, dir):
         try:
-            ADB().get_devices()
-            ADB().set_target_by_id(0)
+            self.adb.get_devices()
+            self.adb.set_target_by_id(0)
         except Exception as e:
             self.errorHandler(e.args[0])
 
-        cmd_result = ADB().shell_command("ls "+dir+" -lR")
+        cmd_result = self.adb.shell_command("ls "+dir+" -lR")
         if "error: no devices/emulators found" in cmd_result:
             self.errorHandler("no devices/emulators found")
             sys.exit()
@@ -104,8 +106,8 @@ class scanRecursive(Thread):
                 if per[:1]=="/":
                     id_dir = None
                     dir = " ".join(str(x) for x in arr) #mennghubungkan nama directory yang berisi spasi
-                    data().insert_dir(dir)
-                    id = data().select_id_dir_by_name(dir)
+                    self.data.insert_dir(dir)
+                    id = self.data.select_id_dir_by_name(dir)
                     print("dir masuk")
                     self.updateProgress()
                 elif per[:1] == "-":
@@ -117,11 +119,11 @@ class scanRecursive(Thread):
                             j = j + 1
                         na = name
                         u = " ".join(str(x) for x in na)
-                        data().insert_file(id_dir, u, arr[0], arr[5], arr[4])
+                        self.data.insert_file(id_dir, u, arr[0], arr[5], arr[4])
                         print("file masuk")
                         self.updateProgress()
                     else:
-                        data().insert_file(id_dir, arr[-1], arr[0], arr[5], arr[4])
+                        self.data.insert_file(id_dir, arr[-1], arr[0], arr[5], arr[4])
                         print("file masuk")
                         self.updateProgress()
                 if self._want_abort:

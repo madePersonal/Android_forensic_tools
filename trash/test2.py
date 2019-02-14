@@ -1,5 +1,5 @@
 from pyand import ADB, Fastboot
-from data import data
+from Data import data
 data = data()
 try:
     adb = ADB()

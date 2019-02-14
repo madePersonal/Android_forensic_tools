@@ -1,4 +1,4 @@
-from data import data
+from Data import Data
 import wx.lib.newevent
 from threading import *
 import time
@@ -57,13 +57,15 @@ class HashEvent(wx.PyEvent):
         self.SetEventType(HASH_RESULT_ID)
         self.hash = hash
 
-class main(Thread):
+class Main(Thread):
     __progress_value = 0
 
     def __init__(self, notify_window):
         Thread.__init__(self)
         self._notify_window = notify_window
         self._want_abort = 0
+        self.adb=ADB()
+        self.data=Data()
 
     def update_progress(self):
         self.__progress_value=self.__progress_value+1
@@ -75,7 +77,7 @@ class main(Thread):
         thread.start()
 
     def view_all_data(self, args):
-        d = data().select_all_data(args)
+        d = self.data.select_all_data(args)
         l = len(d)
         print(l)
         if l !=0:
@@ -88,7 +90,7 @@ class main(Thread):
             self.error_handler("data kosong")
 
     def view_data_by_ext(self, ext, order):
-        d = data().select_by_extention(ext, order)
+        d = self.data.select_by_extention(ext, order)
         l = len(d)
         if l!=0:
             wx.PostEvent(self._notify_window, RangeEvent(l))
@@ -100,7 +102,7 @@ class main(Thread):
             self.error_handler("data Kosong")
 
     def search_data(self, key, order):
-        d = data().search(key, order)
+        d = self.data.search(key, order)
         l = len(d)
         if l != 0:
             wx.PostEvent(self._notify_window, RangeEvent(l))
@@ -116,8 +118,8 @@ class main(Thread):
         cmd5="md5sum -b '%s'" % file
         cmdsha1="sha1sum -b '%s'" % file
         try:
-            md5 = ADB().shell_command(cmd5)
-            sha1 = ADB().shell_command(cmdsha1)
+            md5 = self.adb.shell_command(cmd5)
+            sha1 = self.adb.shell_command(cmdsha1)
             result.append(md5)
             result.append(sha1)
             result.append(file)
