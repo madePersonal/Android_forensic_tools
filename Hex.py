@@ -50,12 +50,9 @@ class Hex(Thread):
             hex = k.encode("hex")
             split = wrap(hex, 2)
             result.append(split)
-
         n = 0
         for g in result:
-            u = "  ".join(str(x) for x in g)
-            wx.PostEvent(self._notify_window, HexEvent(u, unicode(cat_split[n], errors='replace')))
-            print(cat_split[n])
+            wx.PostEvent(self._notify_window, HexEvent(g, unicode(cat_split[n],'utf-8', errors='replace')))
             n = n+1
             time.sleep(0.00001)
 

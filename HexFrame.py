@@ -25,6 +25,7 @@ class HexFrame(wx.Frame):
         bSizer1 = wx.BoxSizer(wx.VERTICAL)
 
         self.listctrl = wx.ListCtrl(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT)
+        # self.listctrl.SetFont(wx.Font(wx.NORMAL_FONT.GetPointSize(), 73, 90, 90, False, wx.EmptyString, wx.FONTENCODING_UTF8))
         bSizer1.Add(self.listctrl, 1, wx.ALL | wx.EXPAND, 5)
 
         self.SetSizer(bSizer1)
@@ -33,8 +34,25 @@ class HexFrame(wx.Frame):
         self.Centre(wx.BOTH)
 
         # table header
-        self.listctrl.InsertColumn(0, 'Byte', wx.LIST_FORMAT_LEFT,width=400)
-        self.listctrl.InsertColumn(1, 'utf-8', wx.LIST_FORMAT_LEFT, 200)
+        width = 25
+        align = wx.LIST_FORMAT_CENTRE
+        self.listctrl.InsertColumn(0, wx.EmptyString, align,width)
+        self.listctrl.InsertColumn(1, wx.EmptyString, align, width)
+        self.listctrl.InsertColumn(2, wx.EmptyString, align, width)
+        self.listctrl.InsertColumn(3, wx.EmptyString, align, width)
+        self.listctrl.InsertColumn(4, wx.EmptyString, align, width)
+        self.listctrl.InsertColumn(5, wx.EmptyString, align, width)
+        self.listctrl.InsertColumn(6, wx.EmptyString, align, width)
+        self.listctrl.InsertColumn(7, wx.EmptyString, align, width)
+        self.listctrl.InsertColumn(8, wx.EmptyString, align, width)
+        self.listctrl.InsertColumn(9, wx.EmptyString, align, width)
+        self.listctrl.InsertColumn(10, wx.EmptyString, align,width)
+        self.listctrl.InsertColumn(11, wx.EmptyString, align, width)
+        self.listctrl.InsertColumn(12, wx.EmptyString, align, width)
+        self.listctrl.InsertColumn(13, wx.EmptyString, align, width)
+        self.listctrl.InsertColumn(14, wx.EmptyString, align, width)
+        self.listctrl.InsertColumn(15, wx.EmptyString, align, width)
+        self.listctrl.InsertColumn(16, wx.EmptyString, wx.LIST_FORMAT_LEFT, 200)
 
         # Connect Event pull
         HEX_RESULT(self, self.ParsingData)
@@ -50,8 +68,23 @@ class HexFrame(wx.Frame):
     def ParsingData(self, event):
         hex = event.hex
         binary = event.binary
-        index=self.listctrl.InsertItem(sys.maxint, hex)
-        self.listctrl.SetItem(index, 1, binary)
+        index=self.listctrl.InsertItem(sys.maxint, hex[0])
+        self.listctrl.SetItem(index, 1, hex[1])
+        self.listctrl.SetItem(index, 2, hex[2])
+        self.listctrl.SetItem(index, 3, hex[3])
+        self.listctrl.SetItem(index, 4, hex[4])
+        self.listctrl.SetItem(index, 5, hex[5])
+        self.listctrl.SetItem(index, 6, hex[6])
+        self.listctrl.SetItem(index, 7, hex[7])
+        self.listctrl.SetItem(index, 8, hex[8])
+        self.listctrl.SetItem(index, 9, hex[9])
+        self.listctrl.SetItem(index, 10, hex[10])
+        self.listctrl.SetItem(index, 11, hex[11])
+        self.listctrl.SetItem(index, 12, hex[12])
+        self.listctrl.SetItem(index, 13, hex[13])
+        self.listctrl.SetItem(index, 14, hex[14])
+        self.listctrl.SetItem(index, 15, hex[15])
+        self.listctrl.SetItem(index, 16, binary)
 
     def OnError(self, event):
         wx.MessageBox(str(event.error), 'Warning', wx.OK | wx.ICON_WARNING)

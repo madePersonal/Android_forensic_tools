@@ -1,6 +1,8 @@
 # import pymysql
 import subprocess
 import sys
+
+import wx
 from pyand import ADB
 from textwrap import wrap
 from os.path import *
@@ -174,16 +176,18 @@ def count_file(self, array):
 # hash2 = sha1("/Users/sartika/Documents/1504505037_KP.docx")
 # hash_asli="bdc1ce95f6676e1bb0d6a48ddb53ae38b7608d6f"
 # print(hash2+"\n"+hash_asli)
-cat = adb.shell_command("cat /sdcard/Download/Aturan-Draft-Jurnal.docx")
-# cat = "jjhhhnndbbggfjfkfkjmgmmnnchhchdnnkskcmnh123"
-cat_split = wrap(cat, 16)
-result = []
-for k in cat_split:
-    print(k)
-    hex = k.encode("hex")
-    split = wrap(hex, 2)
-    result.append(split)
+# cat = adb.shell_command("cat /sdcard/Download/Aturan-Draft-Jurnal.docx")
+# # cat = "jjhhhnndbbggfjfkfkjmgmmnnchhchdnnkskcmnh123"
+# cat_split = wrap(cat, 16)
+# result = []
+# for k in cat_split:
+#     print(k)
+#     hex = k.encode("hex")
+#     split = wrap(hex, 2)
+#     result.append(split)
+#
+# for g in result:
+#     u = "  ".join(str(x) for x in g)
+#     print(u)
 
-for g in result:
-    u = "  ".join(str(x) for x in g)
-    print(u)
+print(wx.PlatformInfo)
