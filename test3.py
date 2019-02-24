@@ -11,7 +11,7 @@ from Data import Data
 import re
 #
 adb = ADB()
-dev = adb.get_devices()
+# dev = adb.get_devices()
 # paring = adb.set_target_by_id(0)
 
 #
@@ -139,7 +139,7 @@ def count_file(self, array):
 # name = array[1][7]+"/"
 # data.insert_sub_dir(2,name)
 #data.insert_file(1, "haik")
-# data.clean_db()
+data.clean_db()
 # d=data.select_id_dir_by_name("/acct/")
 # print(d)
 # r = adb.shell_command("ls /vendor -R -l")
@@ -177,8 +177,8 @@ def count_file(self, array):
 # hash_asli="bdc1ce95f6676e1bb0d6a48ddb53ae38b7608d6f"
 # print(hash2+"\n"+hash_asli)
 # cat = adb.shell_command("cat /sdcard/Download/Aturan-Draft-Jurnal.docx")
-# # cat = "jjhhhnndbbggfjfkfkjmgmmnnchhchdnnkskcmnh123"
-# cat_split = wrap(cat, 16)
+# cat_split = re.findall("................",cat)
+# print(cat_split)
 # result = []
 # for k in cat_split:
 #     print(k)
@@ -189,5 +189,3 @@ def count_file(self, array):
 # for g in result:
 #     u = "  ".join(str(x) for x in g)
 #     print(u)
-
-print(wx.PlatformInfo)

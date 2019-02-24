@@ -43,7 +43,7 @@ class Pull(Thread):
         if "error" in result:
             self.errorHandler(result)
         else:
-            wx.PostEvent(self._notify_window, ResultEvent("sucesfuly"))
+            wx.PostEvent(self._notify_window, ResultEvent("sucessfuly"))
 
     def runPullFile(self, file, dir):
         self.start_thread(self.pull_file, file, dir)

@@ -14,24 +14,36 @@ import wx
 ## Class HexFrame
 ###########################################################################
 
+
+
 class HexFrame(wx.Frame):
 
     def __init__(self, parent, title):
         wx.Frame.__init__(self, parent, id=wx.ID_ANY, title=title, pos=wx.DefaultPosition,
                           size=wx.Size(600, 700), style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
+        self.file = title
 
         self.SetSizeHintsSz(wx.DefaultSize, wx.DefaultSize)
 
-        bSizer1 = wx.BoxSizer(wx.VERTICAL)
+        self.bSizer1 = wx.BoxSizer(wx.VERTICAL)
+
+        self.progress_label = wx.StaticText(self, wx.ID_ANY, u"MyLabel", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.progress_label.Wrap(-1)
+        self.bSizer1.Add(self.progress_label, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 5)
+
+        self.progress_bar = wx.Gauge(self, wx.ID_ANY, 100, wx.DefaultPosition, wx.DefaultSize, wx.GA_HORIZONTAL)
+        self.bSizer1.Add(self.progress_bar, 0, wx.ALL | wx.EXPAND, 5)
 
         self.listctrl = wx.ListCtrl(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT)
-        # self.listctrl.SetFont(wx.Font(wx.NORMAL_FONT.GetPointSize(), 73, 90, 90, False, wx.EmptyString, wx.FONTENCODING_UTF8))
-        bSizer1.Add(self.listctrl, 1, wx.ALL | wx.EXPAND, 5)
+        self.listctrl.SetFont(wx.Font(wx.NORMAL_FONT.GetPointSize(), 76, 90, 90, False, wx.EmptyString))
 
-        self.SetSizer(bSizer1)
+        self.bSizer1.Add(self.listctrl, 1, wx.ALL | wx.EXPAND, 5)
+
+        self.SetSizer(self.bSizer1)
         self.Layout()
 
         self.Centre(wx.BOTH)
+
 
         # table header
         width = 25
@@ -57,10 +69,12 @@ class HexFrame(wx.Frame):
         # Connect Event pull
         HEX_RESULT(self, self.ParsingData)
         ERROR_RESULT(self, self.OnError)
+        RANGE_RESULT(self, self.set_range)
+        PROGRESS_RESULT(self, self.OnProgress)
 
         #run hex
-        hex = Hex(self)
-        hex.run_hex(title)
+        hex = Hex(self, self.file)
+        hex.run_hex()
 
     def __del__(self):
         pass
@@ -86,6 +100,19 @@ class HexFrame(wx.Frame):
         self.listctrl.SetItem(index, 15, hex[15])
         self.listctrl.SetItem(index, 16, binary)
 
+    def set_range(self, event):
+        self.progress_bar.SetRange(event.range)
+
+    def OnProgress(self, event):
+        r = float(self.progress_bar.GetRange())
+        v = float(event.progress)
+        p = v/r*100.0
+        self.progress_label.SetLabel(str(round(p, 1)) + "%")
+        self.progress_bar.SetValue(event.progress)
+        if p == 100.0:
+            self.progress_label.Hide()
+            self.progress_bar.Hide()
+            self.Fit()
+
     def OnError(self, event):
         wx.MessageBox(str(event.error), 'Warning', wx.OK | wx.ICON_WARNING)
-

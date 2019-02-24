@@ -172,7 +172,7 @@ class MainFrame(wx.Frame):
         event.Skip()
 
     def show_scan(self, event):
-        scan = ScanFrame(None)
+        scan = ScanFrame(wx.GetApp().TopWindow)
         scan.Show()
         event.Skip()
 
@@ -208,6 +208,7 @@ class MainFrame(wx.Frame):
 
     def item_right_click(self, event):
         self.PopupMenu(self.menu)
+        event.Skip()
 
     def view_hash(self, event):
         row = self.listFile.GetFocusedItem()
@@ -223,7 +224,7 @@ class MainFrame(wx.Frame):
         name = self.listFile.GetItem(itemIdx=row, col=1).GetText()
         loc = self.listFile.GetItem(itemIdx=row, col=0).GetText()
         file = loc.replace(":", "/") + name
-        pull = PullFrame(None, file)
+        pull = PullFrame(wx.GetApp().TopWindow, file)
         pull.Show()
         event.Skip()
 
@@ -232,8 +233,9 @@ class MainFrame(wx.Frame):
         name = self.listFile.GetItem(itemIdx=row, col=1).GetText()
         loc = self.listFile.GetItem(itemIdx=row, col=0).GetText()
         file = loc.replace(":", "/") + name
-        hex = HexFrame(None, file)
-        hex.Show()
+        hex = HexFrame(wx.GetApp().TopWindow, file)
+        hex.Show(True)
+        event.Skip()
 
     def ParsingData(self, event):
         data = event.data
@@ -242,6 +244,7 @@ class MainFrame(wx.Frame):
         self.listFile.SetItem(index, 2, str(data[3]))
         self.listFile.SetItem(index, 3, str(data[4]))
         self.listFile.SetItem(index, 4, str(data[5]))
+        event.Skip()
 
     def quit(self, event):
         self.Close()
@@ -265,7 +268,13 @@ class MainFrame(wx.Frame):
     def OnError(self, event):
         wx.MessageBox(str(event.error), 'Warning', wx.OK | wx.ICON_WARNING)
 
-if __name__ == '__main__' :
-  app = wx.App(False)
-  appFrame = MainFrame(None).Show()
-  app.MainLoop()
+class MainApp(wx.App):
+    def OnInit(self):
+        self.frame = MainFrame(None)
+        self.frame.Show(True)
+        self.SetTopWindow(self.frame)
+        return True
+
+if __name__ == '__main__':
+    app = MainApp()
+    app.MainLoop()

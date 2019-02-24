@@ -4,10 +4,9 @@ from Pull import *
 class PullFrame(wx.Frame):
 
     def __init__(self, parent, file):
-        self.file=file
         wx.Frame.__init__(self, parent, id=wx.ID_ANY, title="pull file", pos=wx.DefaultPosition,
                           size=wx.Size(350, 125), style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
-
+        self.file = file
         self.SetSizeHintsSz(wx.DefaultSize, wx.DefaultSize)
 
         bSizer1 = wx.BoxSizer(wx.VERTICAL)

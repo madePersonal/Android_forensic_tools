@@ -7,6 +7,7 @@ import sys
 PROGRESS_RESULT_ID = wx.NewId()
 RANGE_RESULT_ID = wx.NewId()
 ERROR_RESULT_ID = wx.NewId()
+ABORT_ID = wx.NewId()
 
 def PROGRESS_RESULT(win, func):
     win.Connect(-1, -1, PROGRESS_RESULT_ID, func)
@@ -16,6 +17,9 @@ def RANGE_RESULT(win, func):
 
 def ERROR_RESULT(win, func):
     win.Connect(-1, -1, ERROR_RESULT_ID, func)
+
+def ABORT(win, func):
+    win.Connect(-1, -1, ABORT_ID, func)
 
 class ProgressEvent(wx.PyEvent):
     def __init__(self, val):
@@ -35,46 +39,38 @@ class ErrorEvent(wx.PyEvent):
         self.SetEventType(ERROR_RESULT_ID)
         self.error = error
 
+class AbortEvent(wx.PyEvent):
+    def __init__(self, message):
+        wx.PyEvent.__init__(self)
+        self.SetEventType(ABORT_ID)
+        self.message = message
+
 class ScanRecursive(Thread):
     __progress_value = -1
 
-    def __init__(self, notify_window):
+    def __init__(self, notify_window, dir):
         Thread.__init__(self)
         self._notify_window = notify_window
         self._want_abort = 0
         self.adb=ADB()
         self.data=Data()
+        self.dir = dir
+        self.start()
 
-    def start_thread(self, func, *args):
-        thread = Thread(target=func, args=args)
-        thread.setDaemon(True)
-        thread.start()
-
-    def run_scan(self, dir):
-        self.start_thread(self.scan, dir)
-
-    def scan(self, dir):
+    def run(self):
         try:
             self.adb.get_devices()
             self.adb.set_target_by_id(0)
         except Exception as e:
             self.errorHandler(e.args[0])
 
-        cmd_result = self.adb.shell_command("ls "+dir+" -lR")
+        cmd_result = self.adb.shell_command("ls "+self.dir+" -lR")
         if "error: no devices/emulators found" in cmd_result:
             self.errorHandler("no devices/emulators found")
-            sys.exit()
-        if self._want_abort:
-            sys.exit()
+
         array = self.create_array(cmd_result)
-        if self._want_abort:
-            sys.exit()
         arr = self.clean_array(array)
-        if self._want_abort:
-            sys.exit()
         range = self.count_file(arr)
-        if self._want_abort:
-            sys.exit()
         wx.PostEvent(self._notify_window, RangeEvent(range))
         self.insert_to_db(arr)
 
@@ -84,6 +80,10 @@ class ScanRecursive(Thread):
 
     def errorHandler(self, error):
         wx.PostEvent(self._notify_window, ErrorEvent(error))
+        self.abort()
+
+    def abortMessage(self, message):
+        wx.PostEvent(self._notify_window, AbortEvent(message))
 
     def count_file(self, array):
         try:
@@ -93,6 +93,7 @@ class ScanRecursive(Thread):
                 if per[:1] == "-" or per[:1] == "d":
                     result.append(arr)
                 if self._want_abort:
+                    self.abortMessage("stoped..")
                     break
             return len(result)
         except Exception as e:
@@ -127,6 +128,7 @@ class ScanRecursive(Thread):
                         print("file masuk")
                         self.updateProgress()
                 if self._want_abort:
+                    self.abortMessage("stoped..")
                     break
         except Exception as e:
             self.errorHandler(e.args[0])
@@ -142,6 +144,7 @@ class ScanRecursive(Thread):
                     h.remove('->')
                 o.append(h)
                 if self._want_abort:
+                    self.abortMessage("stoped..")
                     break
             return o
         except Exception as e:
@@ -157,6 +160,7 @@ class ScanRecursive(Thread):
                     if lengt >= 1 and per!="total" and per!="ls:":#menghilangkan array yang kosong dan kata "total"
                         result.append(arr)
                 if self._want_abort:
+                    self.abortMessage("stoped..")
                     break
             return result
         except Exception as e:
@@ -164,5 +168,7 @@ class ScanRecursive(Thread):
 
     def abort(self):
         self._want_abort = 1
+
+
 
 

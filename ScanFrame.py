@@ -52,6 +52,7 @@ class ScanFrame(wx.Frame):
         RANGE_RESULT(self, self.OnResult)
         PROGRESS_RESULT(self, self.OnProgress)
         ERROR_RESULT(self, self.OnError)
+        ABORT(self, self.OnAbort)
 
         # And indicate we don't have a worker thread yet
         self.worker = None
@@ -76,16 +77,20 @@ class ScanFrame(wx.Frame):
                 dir = "/storage/sdcard1/"
 
             self.status.SetLabel("Menghitung direktori, mohon tunggu..")
-            self.worker = ScanRecursive(self).run_scan(dir)
+            self.worker = ScanRecursive(self, dir)
+        event.Skip()
 
     def stop_scan(self, event):
         if self.worker:
-            self.status.SetLabel("Stoped..")
-            ScanRecursive(self).abort()
+            self.worker.abort()
+            event.Skip()
 
     def OnResult(self, event):
         self.prgsBar_scan.SetRange(0)
         self.prgsBar_scan.SetRange(event.range)
+
+    def OnAbort(self, event):
+        self.status.SetLabel(event.message)
 
     def OnProgress(self, event):
         r = float(self.prgsBar_scan.GetRange())
@@ -97,5 +102,4 @@ class ScanFrame(wx.Frame):
             self.Destroy()
 
     def OnError(self, event):
-        ScanRecursive(self).abort()
         wx.MessageBox(str(event.error), 'Warning', wx.OK | wx.ICON_WARNING)
