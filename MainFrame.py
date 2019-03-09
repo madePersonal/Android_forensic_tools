@@ -253,13 +253,14 @@ class MainFrame(wx.Frame):
     def OnResult(self, event):
         self.progress_bar.SetRange(0)
         self.progress_bar.SetRange(event.range)
+        self.range = self.progress_bar.GetRange()
 
     def OnHashResult(self, event):
         dialog = wx.RichMessageDialog(self, "file: "+event.hash[2]+"\n\n"+"md5: "+event.hash[0]+"sha1: "+event.hash[1],"file hash")
         dialog.ShowModal()
 
     def OnProgress(self, event):
-        r = float(self.progress_bar.GetRange())
+        r = float(self.range)
         v = float(event.val)
         p =v/r*100.0
         self.view_progress.SetLabel(str(round(p, 1))+"%")

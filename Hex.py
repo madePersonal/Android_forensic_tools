@@ -58,14 +58,20 @@ class Hex(Thread):
         self.file = file
         self.adb = ADB()
 
+    def start_thread(self, func):
+        thread = Thread(target=func)
+        thread.setDaemon(True)
+        thread.start()
+
     def update_progress(self):
         self._progress_value = self._progress_value + 1
         wx.PostEvent(self._notify_window, ProgressEvent(self._progress_value))
 
     def run_hex(self):
-        self.run()
+        self._progress_value=0
+        self.start_thread(self.hex)
 
-    def run(self):
+    def hex(self):
         cmd = "cat '%s'"%self.file
         cat = self.adb.shell_command(cmd)
         if "error" in cat:
@@ -81,9 +87,9 @@ class Hex(Thread):
             n = 0
             for g in result:
                 wx.PostEvent(self._notify_window, HexEvent(g, unicode(cat_split[n],'utf-8', errors='replace')))
-                n = n+1
                 self.update_progress()
-                time.sleep(0.00001)
+                n = n + 1
+                time.sleep(0.01)
 
     def error_handler(self, error):
         wx.PostEvent(self._notify_window, ErrorEvent(error))

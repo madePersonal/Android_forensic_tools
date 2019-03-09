@@ -82,37 +82,39 @@ class HexFrame(wx.Frame):
     def ParsingData(self, event):
         hex = event.hex
         binary = event.binary
-        index=self.listctrl.InsertItem(sys.maxint, hex[0])
-        self.listctrl.SetItem(index, 1, hex[1])
-        self.listctrl.SetItem(index, 2, hex[2])
-        self.listctrl.SetItem(index, 3, hex[3])
-        self.listctrl.SetItem(index, 4, hex[4])
-        self.listctrl.SetItem(index, 5, hex[5])
-        self.listctrl.SetItem(index, 6, hex[6])
-        self.listctrl.SetItem(index, 7, hex[7])
-        self.listctrl.SetItem(index, 8, hex[8])
-        self.listctrl.SetItem(index, 9, hex[9])
-        self.listctrl.SetItem(index, 10, hex[10])
-        self.listctrl.SetItem(index, 11, hex[11])
-        self.listctrl.SetItem(index, 12, hex[12])
-        self.listctrl.SetItem(index, 13, hex[13])
-        self.listctrl.SetItem(index, 14, hex[14])
-        self.listctrl.SetItem(index, 15, hex[15])
+        index=self.listctrl.InsertItem(sys.maxint, str(hex[0]).upper())
+        self.listctrl.SetItem(index, 1, str(hex[1]).upper())
+        self.listctrl.SetItem(index, 2, str(hex[2]).upper())
+        self.listctrl.SetItem(index, 3, str(hex[3]).upper())
+        self.listctrl.SetItem(index, 4, str(hex[4]).upper())
+        self.listctrl.SetItem(index, 5, str(hex[5]).upper())
+        self.listctrl.SetItem(index, 6, str(hex[6]).upper())
+        self.listctrl.SetItem(index, 7, str(hex[7]).upper())
+        self.listctrl.SetItem(index, 8, str(hex[8]).upper())
+        self.listctrl.SetItem(index, 9, str(hex[9]).upper())
+        self.listctrl.SetItem(index, 10, str(hex[10]).upper())
+        self.listctrl.SetItem(index, 11, str(hex[11]).upper())
+        self.listctrl.SetItem(index, 12, str(hex[12]).upper())
+        self.listctrl.SetItem(index, 13, str(hex[13]).upper())
+        self.listctrl.SetItem(index, 14, str(hex[14]).upper())
+        self.listctrl.SetItem(index, 15, str(hex[15]).upper())
         self.listctrl.SetItem(index, 16, binary)
 
     def set_range(self, event):
         self.progress_bar.SetRange(event.range)
+        self.range=self.progress_bar.GetRange()
 
     def OnProgress(self, event):
-        r = float(self.progress_bar.GetRange())
+        r = float(self.range)
         v = float(event.progress)
         p = v/r*100.0
+
         self.progress_label.SetLabel(str(round(p, 1)) + "%")
         self.progress_bar.SetValue(event.progress)
         if p == 100.0:
             self.progress_label.Hide()
             self.progress_bar.Hide()
-            self.Fit()
+            self.FitInside()
 
     def OnError(self, event):
         wx.MessageBox(str(event.error), 'Warning', wx.OK | wx.ICON_WARNING)

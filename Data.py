@@ -13,10 +13,10 @@ class Data():
 
     def clean_db(self):
         try:
-            self.cur.execute("DELETE FROM sub_directory;")
-            self.con.commit()
-            self.cur.execute("DELETE FROM SQLITE_SEQUENCE WHERE name='sub_directory';")
-            self.con.commit()
+            # self.cur.execute("DELETE FROM sub_directory;")
+            # self.con.commit()
+            # self.cur.execute("DELETE FROM SQLITE_SEQUENCE WHERE name='sub_directory';")
+            # self.con.commit()
 
             self.cur.execute("DELETE FROM  file;")
             self.con.commit()

@@ -88,12 +88,13 @@ class ScanFrame(wx.Frame):
     def OnResult(self, event):
         self.prgsBar_scan.SetRange(0)
         self.prgsBar_scan.SetRange(event.range)
+        self.range = self.prgsBar_scan.GetRange()
 
     def OnAbort(self, event):
         self.status.SetLabel(event.message)
 
     def OnProgress(self, event):
-        r = float(self.prgsBar_scan.GetRange())
+        r = float(self.range)
         v = float(event.val)
         p = (v/r)*100.0
         self.status.SetLabel(str(round(p,1))+"%")
