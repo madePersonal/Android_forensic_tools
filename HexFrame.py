@@ -34,6 +34,9 @@ class HexFrame(wx.Frame):
         self.progress_bar = wx.Gauge(self, wx.ID_ANY, 100, wx.DefaultPosition, wx.DefaultSize, wx.GA_HORIZONTAL)
         self.bSizer1.Add(self.progress_bar, 0, wx.ALL | wx.EXPAND, 5)
 
+        self.btn_cancel_hex = wx.Button(self, wx.ID_ANY, u"cancel", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.bSizer1.Add(self.btn_cancel_hex, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 5)
+
         self.listctrl = wx.ListCtrl(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT)
         self.listctrl.SetFont(wx.Font(wx.NORMAL_FONT.GetPointSize(), 76, 90, 90, False, wx.EmptyString))
 
@@ -43,6 +46,9 @@ class HexFrame(wx.Frame):
         self.Layout()
 
         self.Centre(wx.BOTH)
+
+        # Connect Events
+        self.btn_cancel_hex.Bind(wx.EVT_BUTTON, self.cancel_hex)
 
 
         # table header
@@ -66,7 +72,7 @@ class HexFrame(wx.Frame):
         self.listctrl.InsertColumn(15, wx.EmptyString, align, width)
         self.listctrl.InsertColumn(16, wx.EmptyString, wx.LIST_FORMAT_LEFT, 200)
 
-        # Connect Event pull
+        # Connect Event hex
         HEX_RESULT(self, self.ParsingData)
         ERROR_RESULT(self, self.OnError)
         RANGE_RESULT(self, self.set_range)
@@ -78,6 +84,10 @@ class HexFrame(wx.Frame):
 
     def __del__(self):
         pass
+
+    def cancel_hex(self, event):
+        self.Destroy()
+        event.Skip()
 
     def ParsingData(self, event):
         hex = event.hex

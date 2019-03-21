@@ -72,6 +72,7 @@ class ScanRecursive(Thread):
         arr = self.clean_array(array)
         range = self.count_file(arr)
         wx.PostEvent(self._notify_window, RangeEvent(range))
+        self.data.clean_db()
         self.insert_to_db(arr)
 
     def updateProgress(self):

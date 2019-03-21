@@ -108,7 +108,7 @@ class MainFrame(wx.Frame):
         self.menu=wx.Menu()
         self.menu.Append(ID_MENU1, "Checksum")
         self.menu.Append(ID_MENU2, "Pull")
-        self.menu.Append(ID_MENU3, "Hexsum")
+        self.menu.Append(ID_MENU3, "view Hex")
 
         #menu bar
         REBOOT_ID = wx.NewId()
@@ -156,16 +156,23 @@ class MainFrame(wx.Frame):
         try:
             device = self.__adb.get_devices()
             self.__adb.set_target_by_id(0)
-
-            device_manufaktur = self.__adb.shell_command("getprop | grep manufacturer")
+            bn = '"'+"'"+'" '
+            # imei_cmd = "service call iphonesubinfo 1 | awk -F "+bn+"'{print $2}'"+"|"+ "sed '1 d' "+"|"+" tr -d "+"'.'"+"|" +" awk"+ " '{print}'"+" ORS="
+            # test = "'adb shell service call iphonesubinfo 1 | awk -F' "+"'%s'"%bn+" ''{print $2}''"
+            # tust = ["service call iphonesubinfo 1 | awk -F %s"%bn ," '{print $2}'"]
+            device_manufaktur = self.__adb.shell_command("getprop | grep ro.product.manufacturer")
             and_version = self.__adb.shell_command("getprop | grep version.release")
             model = self.__adb.shell_command("getprop | grep model")
-            name = self.__adb.shell_command("getprop | grep name")
+            name = self.__adb.shell_command("getprop | grep market.name")
+            product = self.__adb.shell_command("getprop | grep product.name")
             brand = self.__adb.shell_command("getprop | grep brand")
             build_id = self.__adb.shell_command("getprop | grep build.id")
             serial = self.__adb.shell_command("getprop | grep ro.serial")
+            operator = self.__adb.shell_command("getprop | grep operatorname")
+            # IMEI = self.__adb.shell_command(tust)
+            # print(tust)
 
-            result = device_manufaktur+model+and_version+name+brand+build_id+serial
+            result = device_manufaktur+model+and_version+name+brand+build_id+serial+product+operator
             self.txtview_deviceInfo.WriteText(result)
         except:
             self.txtview_deviceInfo.WriteText("[!] No Device/emulator found")
