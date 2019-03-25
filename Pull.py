@@ -4,9 +4,13 @@ import wx
 
 RESULT_ID = wx.NewId()
 ERROR_ID = wx.NewId()
+PROGRESS_ID = wx.NewId()
 
 def RESULT(win, func):
     win.Connect(-1, -1, RESULT_ID, func)
+
+def PROGRESS(win, func):
+    win.Connect(-1, -1, PROGRESS_ID, func)
 
 def ERROR(win, func):
     win.Connect(-1, -1, ERROR_ID, func)
@@ -23,8 +27,14 @@ class ErrorEvent(wx.PyEvent):
         self.SetEventType(ERROR_ID)
         self.error = error
 
-class Pull(Thread):
+class ProgressEvent(wx.PyEvent):
+    def __init__(self, progress, stat):
+        wx.PyEvent.__init__(self)
+        self.SetEventType(PROGRESS_ID)
+        self.progress = progress
+        self.stat = stat
 
+class Pull(Thread):
     def __init__(self, notify_window):
         Thread.__init__(self)
         self._notify_window = notify_window
@@ -37,13 +47,20 @@ class Pull(Thread):
         thread.setDaemon(True)
         thread.start()
 
-    def pull_file(self, file, dir):
-        cmd =["pull", "%s"%file,"%s"%dir]
-        result = self.adb.run_cmd(cmd)
-        if "error" in result:
-            self.errorHandler(result)
-        else:
-            wx.PostEvent(self._notify_window, ResultEvent("sucessfuly"))
+    def pull_file(self, files, dir):
+        count = len(files)
+        wx.PostEvent(self._notify_window, ResultEvent(count))
+        prgs_value = 1
+
+        for file in files:
+            cmd =["pull", "%s"%file,"%s"%dir]
+            result = self.adb.run_cmd(cmd)
+            if "error" in result:
+                self.errorHandler(result)
+                break
+            else:
+                wx.PostEvent(self._notify_window, ProgressEvent(prgs_value, "%s dari %s file"%(prgs_value, count)))
+            prgs_value = prgs_value+1
 
     def runPullFile(self, file, dir):
         self.start_thread(self.pull_file, file, dir)

@@ -228,10 +228,18 @@ class MainFrame(wx.Frame):
 
     def pull_file(self, event):
         row = self.listFile.GetFocusedItem()
-        name = self.listFile.GetItem(itemIdx=row, col=1).GetText()
-        loc = self.listFile.GetItem(itemIdx=row, col=0).GetText()
-        file = loc.replace(":", "/") + name
-        pull = PullFrame(wx.GetApp().TopWindow, file)
+        count = self.listFile.GetSelectedItemCount()
+        first = self.listFile.GetFirstSelected()
+        files =[]
+        i=0
+        for i in range(count):
+            rows = first+i
+            i = i+1
+            name = self.listFile.GetItem(itemIdx=rows, col=1).GetText()
+            loc = self.listFile.GetItem(itemIdx=rows, col=0).GetText()
+            file = loc.replace(":", "/") + name
+            files.append(file)
+        pull = PullFrame(wx.GetApp().TopWindow, files)
         pull.Show()
         event.Skip()
 
