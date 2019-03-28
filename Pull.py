@@ -1,4 +1,6 @@
 from threading import *
+
+import time
 from pyand import ADB
 import wx
 
@@ -41,7 +43,6 @@ class Pull(Thread):
         self._want_abort = 0
         self.adb = ADB()
 
-
     def start_thread(self, func, *args):
         thread = Thread(target=func, args=args)
         thread.setDaemon(True)
@@ -49,6 +50,7 @@ class Pull(Thread):
 
     def pull_file(self, files, dir):
         count = len(files)
+        print(count)
         wx.PostEvent(self._notify_window, ResultEvent(count))
         prgs_value = 1
 
@@ -61,6 +63,7 @@ class Pull(Thread):
             else:
                 wx.PostEvent(self._notify_window, ProgressEvent(prgs_value, "%s dari %s file"%(prgs_value, count)))
             prgs_value = prgs_value+1
+            time.sleep(0.001)
 
     def runPullFile(self, file, dir):
         self.start_thread(self.pull_file, file, dir)

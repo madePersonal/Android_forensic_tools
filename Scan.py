@@ -65,15 +65,15 @@ class ScanRecursive(Thread):
             self.errorHandler(e.args[0])
 
         cmd_result = self.adb.shell_command("ls "+self.dir+" -lR")
-        if "error: no devices/emulators found" in cmd_result:
-            self.errorHandler("no devices/emulators found")
-
-        array = self.create_array(cmd_result)
-        arr = self.clean_array(array)
-        range = self.count_file(arr)
-        wx.PostEvent(self._notify_window, RangeEvent(range))
-        self.data.clean_db()
-        self.insert_to_db(arr)
+        if "error" or "No such file or directory" not in cmd_result:
+            array = self.create_array(cmd_result)
+            arr = self.clean_array(array)
+            range = self.count_file(arr)
+            wx.PostEvent(self._notify_window, RangeEvent(range))
+            self.data.clean_db()
+            self.insert_to_db(arr)
+        elif "error" or "No such file or directory" in cmd_result:
+            self.errorHandler(cmd_result)
 
     def updateProgress(self):
         self.__progress_value=self.__progress_value+1

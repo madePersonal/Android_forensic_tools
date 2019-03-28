@@ -5,13 +5,13 @@ class ScanFrame(wx.Frame):
 
     def __init__(self, parent):
         wx.Frame.__init__(self, parent, id=wx.ID_ANY, title="scan device", pos=wx.DefaultPosition,
-                          size=wx.Size(450, 150), style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
+                          size=wx.Size(450, 200), style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
 
         self.SetSizeHintsSz(wx.DefaultSize, wx.DefaultSize)
 
         bSizer1 = wx.BoxSizer(wx.VERTICAL)
 
-        fgSizer2 = wx.FlexGridSizer(1, 2, 0, 0)
+        fgSizer2 = wx.FlexGridSizer(2, 2, 0, 0)
         fgSizer2.SetFlexibleDirection(wx.BOTH)
         fgSizer2.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
 
@@ -19,15 +19,22 @@ class ScanFrame(wx.Frame):
         self.label_scan_type.Wrap(-1)
         fgSizer2.Add(self.label_scan_type, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_CENTER_HORIZONTAL, 5)
 
-        scan_type_choiceChoices = [u"full (/)", u"internal sdcard (/sdcard/)", u"eksternal sdcard (/storage/sdcard/))"]
+        scan_type_choiceChoices = [u"full (/)", u"internal sdcard (/sdcard)", u"eksternal sdcard (/data/sdcard))"]
         self.scan_type_choice = wx.Choice(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, scan_type_choiceChoices,
                                           0)
         self.scan_type_choice.SetSelection(0)
         fgSizer2.Add(self.scan_type_choice, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_RIGHT, 5)
 
+        self.m_staticText3 = wx.StaticText(self, wx.ID_ANY, u"Custom ", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.m_staticText3.Wrap(-1)
+        fgSizer2.Add(self.m_staticText3, 0, wx.ALL, 5)
+
+        self.custom_dir = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0)
+        fgSizer2.Add(self.custom_dir, 0, wx.ALL | wx.EXPAND, 5)
+
         bSizer1.Add(fgSizer2, 0, wx.EXPAND | wx.ALIGN_CENTER_HORIZONTAL, 5)
 
-        self.status = wx.StaticText(self, wx.ID_ANY, u"", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.status = wx.StaticText(self, wx.ID_ANY, u"SCAN", wx.DefaultPosition, wx.DefaultSize, 0)
         self.status.Wrap(-1)
         bSizer1.Add(self.status, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 5)
 
@@ -68,14 +75,17 @@ class ScanFrame(wx.Frame):
     def start_scan(self, event):
         if not self.worker:
             dir = None
-            type = self.scan_type_choice.GetCurrentSelection()
-            if type == 0:
-                dir = "/"
-            elif type == 1:
-                dir = "/sdcard/"
-            elif type == 2:
-                dir = "/storage/sdcard1/"
-
+            cus_dir = self.custom_dir.GetValue()
+            if cus_dir == "":
+                type = self.scan_type_choice.GetCurrentSelection()
+                if type == 0:
+                    dir = "/"
+                elif type == 1:
+                    dir = "/sdcard/"
+                elif type == 2:
+                    dir = "/storage/sdcard1/"
+            else:
+                dir = cus_dir
             self.status.SetLabel("Menghitung direktori, mohon tunggu..")
             self.worker = ScanRecursive(self, dir)
         event.Skip()
