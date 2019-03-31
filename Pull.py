@@ -50,7 +50,6 @@ class Pull(Thread):
 
     def pull_file(self, files, dir):
         count = len(files)
-        print(count)
         wx.PostEvent(self._notify_window, ResultEvent(count))
         prgs_value = 1
 

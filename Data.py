@@ -1,23 +1,19 @@
 import sqlite3
+from sqlite3 import Error
 
 class Data():
     __error = None
     __result = None
 
-    def __init__(self):
+    def __init__(self, db):
         try:
-            self.con = sqlite3.connect("andr_forensic_tools.db", check_same_thread = False)
+            self.con = sqlite3.connect(db, check_same_thread = False)
             self.cur = self.con.cursor()
-        except Exception as e:
-            print(e.args[0])
+        except Error as e:
+            print(e)
 
     def clean_db(self):
         try:
-            # self.cur.execute("DELETE FROM sub_directory;")
-            # self.con.commit()
-            # self.cur.execute("DELETE FROM SQLITE_SEQUENCE WHERE name='sub_directory';")
-            # self.con.commit()
-
             self.cur.execute("DELETE FROM  file;")
             self.con.commit()
             self.cur.execute("DELETE FROM SQLITE_SEQUENCE WHERE name='file';")
@@ -27,9 +23,49 @@ class Data():
             self.con.commit()
             self.cur.execute("DELETE FROM SQLITE_SEQUENCE WHERE name='directory';")
             self.con.commit()
-        except Exception as e:
-            self.__error = e.args[0]
+        except Error as e:
+            self.__error = e
             return self.__error
+
+    def create_tables(self):
+        tb_directory ='CREATE TABLE "directory" ("id_directory"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "name"	TEXT)'
+        tb_evidence ='CREATE TABLE "evidence" ("case_number" INTEGER, "examiner_name" TEXT, "description" TEXT, "note" TEXT)'
+        tb_pull_log ='CREATE TABLE "pull_log" ("id_log" INTEGER PRIMARY KEY AUTOINCREMENT, "file" TEXT, "from" TEXT, "to" TEXT, "md5_source" TEXT, "sha1_source" TEXT, "date" TEXT )'
+        tb_file = 'CREATE TABLE "file" ("id_file" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "id_directory"	INTEGER NOT NULL, "name" TEXT, "permision" TEXT, "date" TEXT, "Size" REAL)'
+        try:
+            self.cur.execute(tb_directory)
+            self.cur.execute(tb_file)
+            self.cur.execute(tb_evidence)
+            self.cur.execute(tb_pull_log)
+        except Error as e:
+            self.__error = e
+            return self.__error
+
+    def insert_log_pull(self, file, from_path, to_path, md5_source, sha1_source, date):
+        try:
+            query = "NSERT INTO  pull_log (`file`,`from`, `to`, md5_source, sha1_source,`date` )VALUES ('%s','%s','%s','%s','%s','%s')"%(file, from_path, to_path, md5_source, sha1_source, date)
+            self.cur.execute(query)
+            self.con.commit()
+        except Error as e:
+            self.__error = e
+            return self.__error
+
+    def insert_evidence(self, case_number, examiner_name, description, note):
+        try:
+            query = "INSERT INTO evidence (case_number, examiner_name, description, note) VALUES ('%s','%s','%s','%s')"%(case_number, examiner_name, description, note)
+            self.cur.execute(query)
+            self.con.commit()
+        except Error as e:
+            self.__error = e
+            return self.__error
+
+    def select_evidence(self):
+        try:
+            self.cur.execute("SELECT * from evidence")
+            self.__result = self.cur.fetchone()
+            return self.__result
+        except Error as e:
+            print(e)
 
     def select_all_data(self, order):
         try:

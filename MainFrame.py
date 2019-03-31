@@ -16,6 +16,8 @@ from PullFrame import PullFrame
 from HexFrame import HexFrame
 import wx.lib.newevent
 import wx.lib.mixins.listctrl as listmix
+from NewProjectFrame import NewProjectFrame
+import ActiveProject
 
 class MainFrame(wx.Frame):
     __adb = ADB()
@@ -28,7 +30,7 @@ class MainFrame(wx.Frame):
 
         bSizer1 = wx.BoxSizer(wx.VERTICAL)
 
-        gSizer1 = wx.GridSizer(1, 2, 0, 0)
+        gSizer1 = wx.GridSizer(1, 3, 0, 0)
 
         sbSizer1 = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"Action"), wx.VERTICAL)
 
@@ -58,6 +60,15 @@ class MainFrame(wx.Frame):
         sbSizer3.Add(self.txtview_deviceInfo, 1, wx.RIGHT | wx.LEFT | wx.EXPAND, 5)
 
         gSizer1.Add(sbSizer3, 1, wx.EXPAND, 5)
+
+        sbSizer31 = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"project info"), wx.VERTICAL)
+
+        self.textview_projectinfo = wx.richtext.RichTextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition,
+                                                             wx.DefaultSize,
+                                                             0 | wx.VSCROLL | wx.HSCROLL | wx.NO_BORDER | wx.WANTS_CHARS)
+        sbSizer31.Add(self.textview_projectinfo, 1, wx.EXPAND | wx.ALL, 5)
+
+        gSizer1.Add(sbSizer31, 1, wx.EXPAND, 5)
 
         bSizer1.Add(gSizer1, 1, wx.EXPAND, 5)
 
@@ -91,7 +102,7 @@ class MainFrame(wx.Frame):
 
         bSizer1.Add(fgSizer1, 0, wx.EXPAND, 5)
 
-        self.listFile = wx.ListCtrl(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT | wx.LC_SORT_ASCENDING)
+        self.listFile = wx.ListCtrl(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT)
         bSizer1.Add(self.listFile, 1, wx.ALL | wx.EXPAND, 5)
 
         self.SetSizer(bSizer1)
@@ -111,11 +122,13 @@ class MainFrame(wx.Frame):
         self.menu.Append(ID_MENU3, "view Hex")
 
         #menu bar
-        REBOOT_ID = wx.NewId()
+        NEW_PROJECT_ID = wx.NewId()
+        LOAD_PROJECT_ID = wx.NewId()
         menuBar = wx.MenuBar()
-        toolsMenu = wx.Menu()
-        rebootDeviceItem = toolsMenu.Append(REBOOT_ID, "Reboot device", "status")
-        menuBar.Append(toolsMenu, "&Tools")
+        fileMenu = wx.Menu()
+        newProjectItem = fileMenu.Append(NEW_PROJECT_ID, "New project")
+        loadProjectItem = fileMenu.Append(LOAD_PROJECT_ID, "Load project")
+        menuBar.Append(fileMenu, "&File")
         self.SetMenuBar(menuBar)
 
 
@@ -139,7 +152,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.pull_file, id=ID_MENU2)
         self.Bind(wx.EVT_MENU, self.hex_sum, id=ID_MENU3)
 
-        self.Bind(wx.EVT_MENU, self.quit, rebootDeviceItem)
+        self.Bind(wx.EVT_MENU, self.show_new_project, newProjectItem)
 
         #connect event main class
         DATA_RESULT(self, self.ParsingData)
@@ -147,6 +160,7 @@ class MainFrame(wx.Frame):
         PROGRESS_RESULT(self, self.OnProgress)
         ERROR_RESULT(self, self.OnError)
         HASH_RESULT(self, self.OnHashResult)
+        PROJECT_RESULT(self, self.view_project)
 
     def __del__(self):
         pass
@@ -177,6 +191,10 @@ class MainFrame(wx.Frame):
         except:
             self.txtview_deviceInfo.WriteText("[!] No Device/emulator found")
         event.Skip()
+
+    def view_project(self, event):
+        self.textview_projectinfo.WriteText(str(event.data))
+        event.skip()
 
     def show_scan(self, event):
         scan = ScanFrame(wx.GetApp().TopWindow)
@@ -261,8 +279,9 @@ class MainFrame(wx.Frame):
         self.listFile.SetItem(index, 4, str(data[5]))
         event.Skip()
 
-    def quit(self, event):
-        self.Close()
+    def show_new_project(self, event):
+        new_project = NewProjectFrame(wx.GetApp().TopWindow)
+        new_project.Show()
         event.Skip()
 
     def OnResult(self, event):

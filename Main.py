@@ -4,12 +4,14 @@ from threading import *
 import time
 from pyand import ADB
 import sys
+import ActiveProject
 
 DATA_RESULT_ID = wx.NewId()
 RANGE_RESULT_ID = wx.NewId()
 PROGRESS_RESULT_ID = wx.NewId()
 ERROR_RESULT_ID = wx.NewId()
 HASH_RESULT_ID = wx.NewId()
+PROJECT_RESULT_ID = wx.NewId()
 
 def PROGRESS_RESULT(win, func):
     win.Connect(-1, -1, PROGRESS_RESULT_ID, func)
@@ -25,6 +27,9 @@ def DATA_RESULT(win, func):
 
 def HASH_RESULT(win, func):
     win.Connect(-1, -1, HASH_RESULT_ID, func)
+
+def PROJECT_RESULT(win, func):
+    win.Connect(-1, -1, PROJECT_RESULT_ID, func)
 
 
 class ProgressEvent(wx.PyEvent):
@@ -57,6 +62,12 @@ class HashEvent(wx.PyEvent):
         self.SetEventType(HASH_RESULT_ID)
         self.hash = hash
 
+class ProjectEvent(wx.PyEvent):
+    def __init__(self, data):
+        wx.PyEvent.__init__(self)
+        self.SetEventType(PROJECT_RESULT_ID)
+        self.data = data
+
 class Main(Thread):
     __progress_value = 0
 
@@ -65,7 +76,7 @@ class Main(Thread):
         self._notify_window = notify_window
         self._want_abort = 0
         self.adb=ADB()
-        self.data=Data()
+        self.data=Data(ActiveProject.project)
 
     def update_progress(self):
         self.__progress_value=self.__progress_value+1
@@ -127,6 +138,11 @@ class Main(Thread):
         except Exception as e:
             self.error_handler(e.args[0])
 
+    def view_project_info(self):
+        d = self.data.select_evidence()
+        wx.PostEvent(self._notify_window, ProjectEvent(d))
+
+
     def error_handler(self, error):
         wx.PostEvent(self._notify_window, ErrorEvent(error))
 
@@ -136,6 +152,9 @@ class Main(Thread):
 
     def runHashFile(self, file):
         self.start_thread(self.hash_file, file)
+
+    def runViewProject(self):
+        self.start_thread(self.view_project_info)
 
     def runSelectByExt(self, ext, order):
         self.__progress_value = 0

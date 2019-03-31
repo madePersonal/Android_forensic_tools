@@ -74,7 +74,5 @@ def insert_to_db(array):
 
 d = create_array(text)
 r = clean_array(d)
-
-
 for i in r:
     print(i)
