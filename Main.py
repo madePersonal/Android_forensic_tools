@@ -140,6 +140,7 @@ class Main(Thread):
 
     def view_project_info(self):
         d = self.data.select_evidence()
+        print(d)
         wx.PostEvent(self._notify_window, ProjectEvent(d))
 
 

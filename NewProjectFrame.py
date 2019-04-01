@@ -2,15 +2,25 @@
 import wx
 from Data import Data
 import ActiveProject
-from Main import Main
+import wx.lib.newevent
 
+
+RESULT_ID = wx.NewId()
+
+def P_RESULT(win, func):
+    win.Connect(-1, -1, RESULT_ID, func)
+
+class ResultEvent(wx.PyEvent):
+    def __init__(self, val):
+        wx.PyEvent.__init__(self)
+        self.SetEventType(RESULT_ID)
+        self.val = val
 
 class NewProjectFrame(wx.Frame):
-
-    def __init__(self, parent):
+    def __init__(self, parent, notifay_window):
         wx.Frame.__init__(self, parent, id=wx.ID_ANY, title=wx.EmptyString, pos=wx.DefaultPosition,
                           size=wx.Size(450, 330), style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
-
+        self._notifay_window = notifay_window
         self.SetSizeHintsSz(wx.DefaultSize, wx.DefaultSize)
 
         bSizer1 = wx.BoxSizer(wx.VERTICAL)
@@ -115,7 +125,7 @@ class NewProjectFrame(wx.Frame):
 
                 data.insert_evidence(case_number,examiner,description, note)
                 ActiveProject.init(where+"/"+project_name+".db")
-                Main(self).runViewProject()
+                wx.PostEvent(self._notifay_window, ResultEvent(where+"/"+project_name+".db"))
             except Exception as e:
                 print e
 

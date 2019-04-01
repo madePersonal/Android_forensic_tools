@@ -11,12 +11,12 @@ import wx
 import wx.richtext
 from pyand import *
 from ScanFrame import ScanFrame
-from Main import *
+from Main import Main, PROJECT_RESULT, HASH_RESULT, DATA_RESULT, ERROR_RESULT, RANGE_RESULT, PROGRESS_RESULT
 from PullFrame import PullFrame
 from HexFrame import HexFrame
 import wx.lib.newevent
 import wx.lib.mixins.listctrl as listmix
-from NewProjectFrame import NewProjectFrame
+from NewProjectFrame import NewProjectFrame, P_RESULT
 import ActiveProject
 
 class MainFrame(wx.Frame):
@@ -162,6 +162,9 @@ class MainFrame(wx.Frame):
         HASH_RESULT(self, self.OnHashResult)
         PROJECT_RESULT(self, self.view_project)
 
+        # connect even new_project
+        P_RESULT(self, self.load_project)
+
     def __del__(self):
         pass
 
@@ -192,9 +195,26 @@ class MainFrame(wx.Frame):
             self.txtview_deviceInfo.WriteText("[!] No Device/emulator found")
         event.Skip()
 
+    #fungsi-fungsi untuk mebuat project dan menampilkan project
     def view_project(self, event):
-        self.textview_projectinfo.WriteText(str(event.data))
-        event.skip()
+        case_number = "Case Number :"+str(event.data[0])+"\n"
+        examiner = "Examiner :"+event.data[1]+"\n"
+        des = "Description :"+event.data[2]+"\n"
+        note = "Note :"+event.data[3]
+        self.textview_projectinfo.WriteText(case_number+examiner+des+note)
+        event.Skip()
+
+    def load_project(self, event):
+        main = Main(self)
+        main.runViewProject()
+        event.Skip()
+
+    def show_new_project(self, event):
+        new_project = NewProjectFrame(wx.GetApp().TopWindow, self)
+        new_project.Show()
+    # fungsi-fungsi untuk mebuat project dan menampilkan project (end)
+
+
 
     def show_scan(self, event):
         scan = ScanFrame(wx.GetApp().TopWindow)
@@ -277,11 +297,6 @@ class MainFrame(wx.Frame):
         self.listFile.SetItem(index, 2, str(data[3]))
         self.listFile.SetItem(index, 3, str(data[4]))
         self.listFile.SetItem(index, 4, str(data[5]))
-        event.Skip()
-
-    def show_new_project(self, event):
-        new_project = NewProjectFrame(wx.GetApp().TopWindow)
-        new_project.Show()
         event.Skip()
 
     def OnResult(self, event):
