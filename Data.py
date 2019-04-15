@@ -43,7 +43,7 @@ class Data():
 
     def insert_log_pull(self, file, from_path, to_path, md5_source, sha1_source, date):
         try:
-            query = "NSERT INTO  pull_log (`file`,`from`, `to`, md5_source, sha1_source,`date` )VALUES ('%s','%s','%s','%s','%s','%s')"%(file, from_path, to_path, md5_source, sha1_source, date)
+            query = "INSERT INTO  pull_log (`file`,`from`, `to`, md5_source, sha1_source,`date` )VALUES ('%s','%s','%s','%s','%s','%s')"%(file, from_path, to_path, md5_source, sha1_source, date)
             self.cur.execute(query)
             self.con.commit()
         except Error as e:
@@ -63,6 +63,14 @@ class Data():
         try:
             self.cur.execute("SELECT * from evidence")
             self.__result = self.cur.fetchone()
+            return self.__result
+        except Error as e:
+            print(e)
+
+    def select_pull_log(self):
+        try:
+            self.cur.execute("SELECT * from pull_log")
+            self.__result = self.cur.fetchall()
             return self.__result
         except Error as e:
             print(e)

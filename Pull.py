@@ -1,7 +1,9 @@
 from threading import *
-
 import time
+from datetime import datetime
 from pyand import ADB
+from Data import Data
+import ActiveProject
 import wx
 
 RESULT_ID = wx.NewId()
@@ -41,6 +43,7 @@ class Pull(Thread):
         Thread.__init__(self)
         self._notify_window = notify_window
         self._want_abort = 0
+        self.data = Data(ActiveProject.active_project())
         self.adb = ADB()
 
     def start_thread(self, func, *args):
@@ -52,15 +55,20 @@ class Pull(Thread):
         count = len(files)
         wx.PostEvent(self._notify_window, ResultEvent(count))
         prgs_value = 1
-
         for file in files:
-            cmd =["pull", "%s"%file,"%s"%dir]
-            result = self.adb.run_cmd(cmd)
-            if "error" in result:
-                self.errorHandler(result)
+            cmd =["pull", "%s"%file[0],"%s"%dir]
+            cmd5 = "md5sum -b '%s'" % file[0]
+            cmdsha1 = "sha1sum -b '%s'" % file[0]
+            resultpull = self.adb.run_cmd(cmd)
+            resultmd5 = self.adb.shell_command(cmd5)
+            resultsha1 = self.adb.shell_command(cmdsha1)
+
+            if "error" in resultpull and resultmd5 and resultsha1:
+                self.errorHandler(resultpull)
                 break
             else:
                 wx.PostEvent(self._notify_window, ProgressEvent(prgs_value, "%s dari %s file"%(prgs_value, count)))
+                self.data.insert_log_pull(file[1], file[2], dir, resultmd5, resultsha1, datetime.utcnow())
             prgs_value = prgs_value+1
             time.sleep(0.001)
 

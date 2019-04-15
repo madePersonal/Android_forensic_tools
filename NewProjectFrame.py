@@ -128,9 +128,8 @@ class NewProjectFrame(wx.Frame):
                 wx.PostEvent(self._notifay_window, ResultEvent(where+"/"+project_name+".db"))
             except Exception as e:
                 print e
-
             finally:
-                self.Destroy()
+                self.Close()
 
         event.Skip()
 

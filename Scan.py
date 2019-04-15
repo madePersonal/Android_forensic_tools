@@ -2,6 +2,7 @@ from Data import Data
 import wx.lib.newevent
 from pyand import ADB, Fastboot
 from threading import *
+import ActiveProject
 import sys
 
 PROGRESS_RESULT_ID = wx.NewId()
@@ -53,7 +54,10 @@ class ScanRecursive(Thread):
         self._notify_window = notify_window
         self._want_abort = 0
         self.adb=ADB()
-        self.data=Data()
+        try:
+            self.data=Data(ActiveProject.active_project())
+        except:
+            self.errorHandler("no project opned")
         self.dir = dir
         self.start()
 
@@ -65,14 +69,14 @@ class ScanRecursive(Thread):
             self.errorHandler(e.args[0])
 
         cmd_result = self.adb.shell_command("ls "+self.dir+" -lR")
-        if "error" or "No such file or directory" not in cmd_result:
+        if "error" and "No such file or directory" and "no device found" not in cmd_result:
             array = self.create_array(cmd_result)
             arr = self.clean_array(array)
             range = self.count_file(arr)
             wx.PostEvent(self._notify_window, RangeEvent(range))
             self.data.clean_db()
             self.insert_to_db(arr)
-        elif "error" or "No such file or directory" in cmd_result:
+        elif "error" or "No such file or directory" or "no device found" in cmd_result:
             self.errorHandler(cmd_result)
 
     def updateProgress(self):
@@ -105,29 +109,43 @@ class ScanRecursive(Thread):
             for arr in array:
                 name =[]
                 per = arr[0]
-                if per[:1]=="/":
+                if per[:1]=="/": #jika direktori
                     id_dir = None
-                    dir = " ".join(str(x) for x in arr) #mennghubungkan nama directory yang berisi spasi
+                    dir = " ".join(str(x) for x in arr) #menghubungkan nama directory yang berisi spasi
                     self.data.insert_dir(dir)
                     id = self.data.select_id_dir_by_name(dir)
-                    print("dir masuk")
                     self.updateProgress()
-                elif per[:1] == "-":
+                elif per[:1] == "-": #jika file
+                    dir_num_content = unicode(arr[1])
                     id_dir = id[0][0]
-                    if len(arr) > 8:  # jika nama file berisi spasi
-                        j = 7
-                        while j <= len(arr) - 1:
-                            name.append(arr[j])
-                            j = j + 1
-                        na = name
-                        u = " ".join(str(x) for x in na)
-                        self.data.insert_file(id_dir, u, arr[0], arr[5], arr[4])
-                        print("file masuk")
-                        self.updateProgress()
-                    else:
-                        self.data.insert_file(id_dir, arr[-1], arr[0], arr[5], arr[4])
-                        print("file masuk")
-                        self.updateProgress()
+                    if dir_num_content.isnumeric() == True:
+                        if len(arr) > 8:  # jika nama file berisi spasi
+                            j = 7
+                            while j <= len(arr) - 1:
+                                name.append(arr[j])
+                                j = j + 1
+                            na = name
+                            u = " ".join(str(x) for x in na)
+                            self.data.insert_file(id_dir, u, arr[0], arr[5], arr[4])
+                            self.updateProgress()
+                        else:
+                            self.data.insert_file(id_dir, arr[-1], arr[0], arr[5], arr[4])
+                            self.updateProgress()
+
+                    elif dir_num_content.isnumeric() == False:
+                        if len(arr) > 7:  # jika nama file berisi spasi
+                            j = 6
+                            while j <= len(arr) - 1:
+                                name.append(arr[j])
+                                j = j + 1
+                            na = name
+                            u = " ".join(str(x) for x in na)
+                            self.data.insert_file(id_dir, u, arr[0], arr[4], arr[3])
+                            self.updateProgress()
+                        else:
+                            self.data.insert_file(id_dir, arr[-1], arr[0], arr[4], arr[3])
+                            self.updateProgress()
+
                 if self._want_abort:
                     self.abortMessage("stoped..")
                     break

@@ -1,19 +1,13 @@
-# -*- coding: utf-8 -*-
-
-###########################################################################
-## Python code generated with wxFormBuilder (version Sep 12 2010)
-## http://www.wxformbuilder.org/
-##
-## PLEASE DO "NOT" EDIT THIS FILE!
-###########################################################################
 import sys
 import wx
 import wx.richtext
-from pyand import *
+from pyand import ADB
 from ScanFrame import ScanFrame
 from Main import Main, PROJECT_RESULT, HASH_RESULT, DATA_RESULT, ERROR_RESULT, RANGE_RESULT, PROGRESS_RESULT
 from PullFrame import PullFrame
 from HexFrame import HexFrame
+from OpenProjectDialog import OpenProjectDialog, OPEN_RESULT
+from PullLogFrame import PullLogFrame
 import wx.lib.newevent
 import wx.lib.mixins.listctrl as listmix
 from NewProjectFrame import NewProjectFrame, P_RESULT
@@ -124,14 +118,16 @@ class MainFrame(wx.Frame):
         #menu bar
         NEW_PROJECT_ID = wx.NewId()
         LOAD_PROJECT_ID = wx.NewId()
+        VIEW_LOG_PULL_ID = wx.NewId()
         menuBar = wx.MenuBar()
         fileMenu = wx.Menu()
+        viewMenu = wx.Menu()
         newProjectItem = fileMenu.Append(NEW_PROJECT_ID, "New project")
-        loadProjectItem = fileMenu.Append(LOAD_PROJECT_ID, "Load project")
+        openProjectItem = fileMenu.Append(LOAD_PROJECT_ID, "Open project")
+        viewPullLogItem = viewMenu.Append(VIEW_LOG_PULL_ID, "View pull log")
         menuBar.Append(fileMenu, "&File")
+        menuBar.Append(viewMenu, "&View")
         self.SetMenuBar(menuBar)
-
-
 
         # table header
         self.listFile.InsertColumn(0, 'lokasi', width=290)
@@ -152,7 +148,10 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.pull_file, id=ID_MENU2)
         self.Bind(wx.EVT_MENU, self.hex_sum, id=ID_MENU3)
 
+        # connect event menubar
         self.Bind(wx.EVT_MENU, self.show_new_project, newProjectItem)
+        self.Bind(wx.EVT_MENU, self.open_project, openProjectItem)
+        self.Bind(wx.EVT_MENU, self.view_log_pull, viewPullLogItem)
 
         #connect event main class
         DATA_RESULT(self, self.ParsingData)
@@ -162,8 +161,11 @@ class MainFrame(wx.Frame):
         HASH_RESULT(self, self.OnHashResult)
         PROJECT_RESULT(self, self.view_project)
 
-        # connect even new_project
+        # connect even new_project class
         P_RESULT(self, self.load_project)
+
+        #connect event Open_project class
+        OPEN_RESULT(self, self.load_project)
 
     def __del__(self):
         pass
@@ -197,10 +199,11 @@ class MainFrame(wx.Frame):
 
     #fungsi-fungsi untuk mebuat project dan menampilkan project
     def view_project(self, event):
+        self.textview_projectinfo.Clear()
         case_number = "Case Number :"+str(event.data[0])+"\n"
-        examiner = "Examiner :"+event.data[1]+"\n"
-        des = "Description :"+event.data[2]+"\n"
-        note = "Note :"+event.data[3]
+        examiner = "Examiner \t:"+event.data[1]+"\n"
+        des = "Description \t:"+event.data[2]+"\n"
+        note = "Note \t\t:"+event.data[3]
         self.textview_projectinfo.WriteText(case_number+examiner+des+note)
         event.Skip()
 
@@ -212,9 +215,13 @@ class MainFrame(wx.Frame):
     def show_new_project(self, event):
         new_project = NewProjectFrame(wx.GetApp().TopWindow, self)
         new_project.Show()
+        event.Skip()
+
+    def open_project(self, event):
+        open_project = OpenProjectDialog(wx.GetApp().TopWindow, self)
+        open_project.Show()
+        event.Skip()
     # fungsi-fungsi untuk mebuat project dan menampilkan project (end)
-
-
 
     def show_scan(self, event):
         scan = ScanFrame(wx.GetApp().TopWindow)
@@ -226,6 +233,11 @@ class MainFrame(wx.Frame):
         d=self.file_ext.GetStringSelection()
         order = self.short_by()
         Main(self).runSelectByExt(ext=d, order=order)
+        event.Skip()
+
+    def view_log_pull(self, event):
+        pull = PullLogFrame(wx.GetApp().TopWindow)
+        pull.Show()
         event.Skip()
 
     def short_by(self):
@@ -265,18 +277,21 @@ class MainFrame(wx.Frame):
         event.Skip()
 
     def pull_file(self, event):
-        row = self.listFile.GetFocusedItem()
         count = self.listFile.GetSelectedItemCount()
         first = self.listFile.GetFirstSelected()
         files =[]
         i=0
         for i in range(count):
             rows = first+i
+            bit = []
             i = i+1
             name = self.listFile.GetItem(itemIdx=rows, col=1).GetText()
             loc = self.listFile.GetItem(itemIdx=rows, col=0).GetText()
             file = loc.replace(":", "/") + name
-            files.append(file)
+            bit.append(file)
+            bit.append(name)
+            bit.append(loc)
+            files.append(bit)
         pull = PullFrame(wx.GetApp().TopWindow, files)
         pull.Show()
         event.Skip()

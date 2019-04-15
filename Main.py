@@ -76,7 +76,10 @@ class Main(Thread):
         self._notify_window = notify_window
         self._want_abort = 0
         self.adb=ADB()
-        self.data=Data(ActiveProject.project)
+        try:
+            self.data=Data(ActiveProject.active_project())
+        except Exception as e:
+            self.error_handler("no project opened")
 
     def update_progress(self):
         self.__progress_value=self.__progress_value+1
@@ -112,6 +115,16 @@ class Main(Thread):
         else:
             self.error_handler("data Kosong")
 
+    def view_log_pull(self):
+        d = self.data.select_pull_log()
+        l = len(d)
+        if l != 0:
+            for i in d:
+                wx.PostEvent(self._notify_window, DataEvent(i))
+                time.sleep(0.0005)
+        else:
+            self.error_handler("data Kosong")
+
     def search_data(self, key, order):
         d = self.data.search(key, order)
         l = len(d)
@@ -140,7 +153,6 @@ class Main(Thread):
 
     def view_project_info(self):
         d = self.data.select_evidence()
-        print(d)
         wx.PostEvent(self._notify_window, ProjectEvent(d))
 
 
@@ -164,3 +176,6 @@ class Main(Thread):
     def runSearchData(self, key, order):
         self.__progress_value = 0
         self.start_thread(self.search_data, key, order)
+
+    def runViewLogPull(self):
+        self.start_thread(self.view_log_pull)
