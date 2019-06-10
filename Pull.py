@@ -67,7 +67,7 @@ class Pull(Thread):
                 self.errorHandler(resultpull)
                 break
             else:
-                wx.PostEvent(self._notify_window, ProgressEvent(prgs_value, "%s dari %s file"%(prgs_value, count)))
+                wx.PostEvent(self._notify_window, ProgressEvent(prgs_value, "%s of %s file"%(prgs_value, count)))
                 self.data.insert_log_pull(file[1], file[2], dir, resultmd5, resultsha1, datetime.utcnow())
             prgs_value = prgs_value+1
             time.sleep(0.001)

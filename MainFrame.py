@@ -34,7 +34,7 @@ class MainFrame(wx.Frame):
         self.btn_scan = wx.Button(self, wx.ID_ANY, u"Scan", wx.DefaultPosition, wx.DefaultSize, 0)
         sbSizer1.Add(self.btn_scan, 0, wx.ALL | wx.EXPAND | wx.ALIGN_CENTER_HORIZONTAL, 5)
 
-        self.btn_viewData = wx.Button(self, wx.ID_ANY, u"tampilkan data", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.btn_viewData = wx.Button(self, wx.ID_ANY, u"show data", wx.DefaultPosition, wx.DefaultSize, 0)
         sbSizer1.Add(self.btn_viewData, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL | wx.EXPAND, 5)
 
         self.progress_bar = wx.Gauge(self, wx.ID_ANY, 100, wx.DefaultPosition, wx.DefaultSize, wx.GA_HORIZONTAL)
@@ -130,7 +130,7 @@ class MainFrame(wx.Frame):
         self.SetMenuBar(menuBar)
 
         # table header
-        self.listFile.InsertColumn(0, 'lokasi', width=290)
+        self.listFile.InsertColumn(0, 'location', width=290)
         self.listFile.InsertColumn(1, 'file', wx.LIST_FORMAT_CENTER, 200)
         self.listFile.InsertColumn(2, 'permission', wx.LIST_FORMAT_CENTER, 100)
         self.listFile.InsertColumn(3, 'size', wx.LIST_FORMAT_CENTER, 100)

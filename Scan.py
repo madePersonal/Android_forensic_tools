@@ -155,7 +155,7 @@ class ScanRecursive(Thread):
     def create_array(self, text):
         o = []
         try:
-            line = text.split("\n")
+            line = text.splitlines()
             for l in line:
                 y = (str(l).split(" "))
                 h = filter(None, y)

@@ -86,7 +86,7 @@ class ScanFrame(wx.Frame):
                     dir = "/storage/sdcard1/"
             else:
                 dir = cus_dir
-            self.status.SetLabel("Menghitung direktori, mohon tunggu..")
+            self.status.SetLabel("counting directories, please wait..")
             self.worker = ScanRecursive(self, dir)
         event.Skip()
 
