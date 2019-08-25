@@ -27,7 +27,7 @@ class ADB(object):
 
     # default TCP/IP port
     DEFAULT_TCP_PORT = 5555
-    # default TCP/IP host
+    # default TCP/IP hos
     DEFAULT_TCP_HOST = "localhost"
 
     def __init__(self, adb_path="adb"):
