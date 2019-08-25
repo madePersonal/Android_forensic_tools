@@ -2,7 +2,7 @@ from Data import Data
 import wx.lib.newevent
 from threading import *
 import time
-from pyand import ADB
+from PyAndroid import ADB
 import sys
 import ActiveProject
 

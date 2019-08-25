@@ -1,5 +1,5 @@
 import time
-from pyand import ADB
+from PyAndroid import ADB
 from threading import *
 import re
 import wx

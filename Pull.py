@@ -1,7 +1,7 @@
 from threading import *
 import time
 from datetime import datetime
-from pyand import ADB
+from PyAndroid import ADB
 from Data import Data
 import ActiveProject
 import wx

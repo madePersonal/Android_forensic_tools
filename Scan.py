@@ -1,6 +1,6 @@
 from Data import Data
 import wx.lib.newevent
-from pyand import ADB, Fastboot
+from PyAndroid import ADB
 from threading import *
 import ActiveProject
 import sys

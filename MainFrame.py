@@ -1,7 +1,7 @@
 import sys
 import wx
 import wx.richtext
-from pyand import ADB
+from PyAndroid import ADB
 from ScanFrame import ScanFrame
 from Main import Main, PROJECT_RESULT, HASH_RESULT, DATA_RESULT, ERROR_RESULT, RANGE_RESULT, PROGRESS_RESULT
 from PullFrame import PullFrame
